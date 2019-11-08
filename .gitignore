@@ -1,0 +1,8 @@
+.directory
+
+*.bak
+*.orig
+*.user
+*~
+
+build*/
