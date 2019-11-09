@@ -1,0 +1,2 @@
+add_subdirectory(Applications)
+add_subdirectory(Libs)
