@@ -9,7 +9,13 @@ file(GLOB_RECURSE INCLUDE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/include/*.h**")
 file(GLOB_RECURSE HEADER_FILES  "${CMAKE_CURRENT_SOURCE_DIR}/src/*.h**")
 file(GLOB_RECURSE SOURCE_FILES  "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp")
 
-add_library(${PROJECT_NAME} STATIC ${INCLUDE_FILES} ${HEADER_FILES} ${SOURCE_FILES})
+qt5_add_resources(QT_RESOURCES resources/PhotoHelper.qrc)
+
+add_library(${PROJECT_NAME} STATIC
+  ${INCLUDE_FILES}
+  ${HEADER_FILES}
+  ${SOURCE_FILES}
+  ${QT_RESOURCES})
 
 target_include_directories(${PROJECT_NAME}
 PUBLIC
