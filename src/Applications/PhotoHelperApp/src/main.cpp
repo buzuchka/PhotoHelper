@@ -8,11 +8,14 @@
 
 #include <QtQml/QQmlEngine>
 
+#include <QImageReader>
+
 using namespace PhotoHelper;
 
 int main(int argc, char** argv)
 {
   QApplication app(argc, argv);
+  app.setWindowIcon(QIcon(":icons/logo"));
 
   Q_INIT_RESOURCE(PhotoHelper);
 
@@ -22,6 +25,8 @@ int main(int argc, char** argv)
 
   auto fs  = d->getSourcePath();
   auto ds = d->getDestinationPathList();
+
+  auto hghgh = QImageReader::supportedImageFormats();
 
   QQuickView viewer;
 
