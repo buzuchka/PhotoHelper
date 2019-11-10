@@ -3,6 +3,8 @@
 
 #include <photohelper_export.h>
 
+#include <PhotoHelper/Types.h>
+
 #include <QStringList>
 #include <QReadWriteLock>
 
@@ -11,6 +13,7 @@ class QVariant;
 
 namespace PhotoHelper {
 
+//! Менеджер для работы с настройками
 class PHOTOHELPER_EXPORT ConfigManager
 {
 public:
@@ -18,11 +21,11 @@ public:
 
   static ConfigManager* getInstance();
 
-  QString getSourcePath();
-  void setSourcePath(const QString& path);
+  FolderConfigPair getSourceFolderPair();
+  void setSourcePath(const FolderConfigPair &path);
 
-  QStringList getDestinationPathList();
-  void setDestinationPathList(const QStringList & pathList);
+  FolderConfigList getDestinationPathList();
+  void setDestinationPathList(const FolderConfigList & folderList);
 
 private:
   explicit ConfigManager(const QString &fileName = QString());

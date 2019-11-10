@@ -13,8 +13,12 @@ QMutex mutex;
 
 namespace PhotoHelper {
 
-const QString sourceDirName = QLatin1String("SourceDir");
-const QString destinationDirsName = QLatin1String("DestinationDirs");
+const QString sourceDirNameProperty = QLatin1String("SourceDirName");
+const QString sourceDirPathProperty = QLatin1String("SourceDirPath");
+
+const QString destinationPathListNameGroup("DestinationPathList");
+const QString folderNameProperty("FolderName");
+const QString folderPathProperty("FolderPath");
 
 ConfigManager* ConfigManager::m_configManager = nullptr;
 
@@ -44,24 +48,55 @@ ConfigManager *ConfigManager::getInstance()
   return m_configManager;
 }
 
-QString ConfigManager::getSourcePath()
+FolderConfigPair ConfigManager::getSourceFolderPair()
 {
-  return getStringValue(sourceDirName);
+  return FolderConfigPair(getStringValue(sourceDirNameProperty),
+                          getStringValue(sourceDirPathProperty));
 }
 
-void ConfigManager::setSourcePath(const QString &path)
+void ConfigManager::setSourcePath(const FolderConfigPair &folderPair)
 {
-  setValue(sourceDirName, path);
+  setValue(sourceDirNameProperty, folderPair.first);
+  setValue(sourceDirPathProperty, folderPair.second);
 }
 
-QStringList ConfigManager::getDestinationPathList()
+FolderConfigList ConfigManager::getDestinationPathList()
 {
-  return getStringListValue(destinationDirsName);
+  QReadLocker locker(&m_readWriteLock);
+  Q_UNUSED(locker);
+
+  FolderConfigList list;
+
+  int size = m_settings->beginReadArray(destinationPathListNameGroup);
+
+  for (int i = 0; i < size; ++i) {
+      m_settings->setArrayIndex(i);
+
+      list.append({m_settings->value(folderNameProperty).toString(),
+                   m_settings->value(folderPathProperty).toString()});
+  }
+  m_settings->endArray();
+
+  return list;
 }
 
-void ConfigManager::setDestinationPathList(const QStringList &pathList)
+void ConfigManager::setDestinationPathList(const FolderConfigList &folderList)
 {
-  setValue(destinationDirsName, pathList);
+  QWriteLocker locker(&m_readWriteLock);
+  Q_UNUSED(locker);
+
+  if (folderList.isEmpty())
+      return;
+
+  m_settings->beginWriteArray(destinationPathListNameGroup);
+
+  for (int i = 0; i < folderList.size(); ++i) {
+      m_settings->setArrayIndex(i);
+      m_settings->setValue(folderNameProperty, folderList.at(i).first);
+      m_settings->setValue(folderPathProperty, folderList.at(i).second);
+  }
+
+  m_settings->endArray();
 }
 
 QString ConfigManager::getStringValue(const QString &propertyName,

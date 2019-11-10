@@ -1,15 +1,43 @@
 import QtQuick 2.0
-import QtQuick.Controls 2.13
+import QtQuick.Controls 2.12
 import QtQuick.Dialogs 1.3
 import QtQuick.Layouts 1.3
+import QtQuick.Window 2.13
+
+import FolderSet 1.0
 
 Item {
   id: root
 
-  width: 800
-  height: 300
+  property FolderSet folderSet
 
-  Column {
+  property int firstColumnWidth: 200
+
+  function saveModel(model, set) {
+    for(var i = 0; i < model.count; ++i) {
+      var listItem = model.get(i);
+      set.addDestinationPath(listItem.name, listItem.path)
+    }
+  }
+
+  function loadSet(set, model) {
+    model.clear()
+    var list = set.getDestinationVariantList()
+    for(var i = 0; i < list.length; ++i) {
+      model.append({name: list[i].first,
+                    path: list[i].second})
+    }
+
+    if(model.count === 0)
+      model.append({name: "", path: ""})
+  }
+
+  signal destinationChooseFolderButtonClicked(int index)
+
+  width: 800
+  height: 350
+
+  ColumnLayout {
     id: column
 
     anchors.fill: parent
@@ -17,57 +45,153 @@ Item {
 
     spacing: 10
 
+    RowLayout {
+      spacing: 10
 
-    Repeater {
-      id: repeater
+      TextField {
+        id: sourceNameTextField
+        implicitWidth: firstColumnWidth
+        enabled: false
+        color: "black"
+      }
+      TextField {
+        id: sourcePathTextField
+        Layout.fillWidth: true
+        enabled: false
+        placeholderText: qsTr("Выберите папку")
+      }
+      Button {
+        id: sourceChooseFolderButton
+        text: qsTr("Выберите папку")
 
-      property int clickedIndex: 0
+        onClicked: sourceFolderDialog.open()
+      }
+    }
 
-      model: 5
+    ListView {
+      id: listView
 
-      Item {
+      Layout.fillWidth: true
+      Layout.fillHeight: true
+
+      clip: true
+
+      delegate: Item {
         property alias folderPath: pathTextField.text
 
         implicitWidth: parent.width
         implicitHeight: chooseFolderButton.height
 
-        RowLayout{
+        RowLayout {
           anchors.fill: parent
 
           spacing: 10
 
           TextField {
             id: nameTextField
+            implicitWidth: firstColumnWidth
 
-            width: 500
-
-            text: index == 0 ? qsTr("Для разбора") : ""
+            text: model.name
             placeholderText: qsTr("Введите имя")
+            onEditingFinished: listModel.get(index).name = text
           }
           TextField {
             id: pathTextField
 
             Layout.fillWidth: true
+
+            text: model.path
+            enabled: false
+            onEditingFinished: listModel.get(index).path = text
+
           }
           Button {
             id: chooseFolderButton
-
-            height: 40
-
             text: qsTr("Выберите папку")
+            onClicked: destinationChooseFolderButtonClicked(index)
+          }
+        }
+      }
+
+      model: ListModel {
+        id: listModel
+    }
+    }
+
+    RowLayout {
+      Layout.fillWidth: true
+
+      Item {
+        Layout.fillWidth: true
+
+        height: addFolderButton.height
+
+        RowLayout {
+          Layout.alignment: Qt.AlignLeft
+
+          ToolButton {
+            id: addFolderButton
+
+
+            text: qsTr("Добавить")
 
             onClicked: {
-              repeater.clickedButtonIndex = index
-              fileDialog.open()
+              listModel.append({name: "", path: ""})
             }
           }
+
+          ToolButton {
+            id: deleteFolderButton
+
+            text: qsTr("Удалить")
+
+            enabled: listModel.count > 0 ? true : false
+
+            onClicked: {
+              listModel.remove(listModel.count - 1)
+            }
+          }
+        }
+      }
+
+      ToolButton {
+        id: continueButton
+
+        Layout.alignment: Qt.AlignRight
+
+        text: qsTr("Дальше")
+
+        enabled: listModel.count > 0 ? true : false
+
+        onClicked: {
+          folderSet.setSourcePath(sourceNameTextField.text,
+                                  sourcePathTextField.text)
+          saveModel(listModel, folderSet)
         }
       }
     }
   }
 
+  Component.onCompleted: {
+    sourceNameTextField.text = folderSet.getSourceName()
+    if(sourceNameTextField.text.length === 0)
+      sourceNameTextField.text = qsTr("Исходный каталог")
+
+    sourcePathTextField.text = folderSet.getSourcePath()
+
+    loadSet(folderSet, listModel)
+  }
+
+  Connections {
+    target: root
+    onDestinationChooseFolderButtonClicked: {
+      destinationFolderDialog.clickedIndex = index
+      destinationFolderDialog.open()
+    }
+  }
+
   FileDialog {
-    id: fileDialog
+    id: sourceFolderDialog
 
     title: qsTr("Выберите папку")
     selectFolder: true
@@ -75,7 +199,28 @@ Item {
     folder: shortcuts.home
 
     onAccepted: {
-      repeater.itemAt(repeater.clickedIndex).folderPath = fileDialog.fileUrl
+      sourcePathTextField.text =
+          sourceFolderDialog.fileUrl.toString().replace("file:///","")
+      close()
+    }
+    onRejected: {
+      close()
+    }
+  }
+
+  FileDialog {
+    id: destinationFolderDialog
+
+    property int clickedIndex: 0
+
+    title: qsTr("Выберите папку")
+    selectFolder: true
+    selectMultiple: false
+    folder: shortcuts.home
+
+    onAccepted: {
+      listModel.get(clickedIndex).path =
+          destinationFolderDialog.fileUrl.toString().replace("file:///","")
       close()
     }
     onRejected: {

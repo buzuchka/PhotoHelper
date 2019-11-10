@@ -1,32 +1,54 @@
 #include <QApplication>
 
 #include <PhotoHelper/ConfigManager.h>
+#include <PhotoHelper/FolderSet.h>
 
 #include <QStringList>
 
 #include <QtQuick/QQuickView>
 
+#include <QtQml/QQmlContext>
 #include <QtQml/QQmlEngine>
 
 #include <QImageReader>
 
 using namespace PhotoHelper;
 
+void qmlRegisterTypes()
+{
+  qmlRegisterType<FolderSet>("FolderSet", 1, 0, "FolderSet");
+}
+
 int main(int argc, char** argv)
 {
   QApplication app(argc, argv);
+
   app.setWindowIcon(QIcon(":icons/logo"));
+  app.setOrganizationName("Buzuchka");
+  app.setOrganizationDomain("Photo Helper");
+  app.setApplicationVersion("0.1");
+
+  qmlRegisterTypes();
 
   Q_INIT_RESOURCE(PhotoHelper);
 
-  auto *d = ConfigManager::getInstance();
-  d->setSourcePath("ololo");
-  d->setDestinationPathList({"popopp", "sjkkjsk"});
+  auto *configManager = ConfigManager::getInstance();
 
-  auto fs  = d->getSourcePath();
-  auto ds = d->getDestinationPathList();
+  FolderSet folderSet;
+  folderSet.setSourcePath(configManager->getSourceFolderPair());
+  folderSet.setDestinationPathList(configManager->getDestinationPathList());
 
-  auto hghgh = QImageReader::supportedImageFormats();
+  QObject::connect(&folderSet, &FolderSet::sourcePathChanged,
+          [configManager, &folderSet]()
+  {
+    configManager->setSourcePath({folderSet.getSourceName(),
+                                  folderSet.getSourcePath()});
+  });
+  QObject::connect(&folderSet, &FolderSet::destinationPathListChanged,
+          [configManager, &folderSet]()
+  {
+    configManager->setDestinationPathList(folderSet.getDestinationPathList());
+  });
 
   QQuickView viewer;
 
@@ -35,12 +57,8 @@ int main(int argc, char** argv)
 
   viewer.setTitle(QStringLiteral("QML Photo Helper"));
 
-  /*ScatterData *data = new ScatterData;
-  TwoAxesChartController * viewController = new TwoAxesChartController;
-
-   viewer.rootContext()->setContextProperty("viewController",
-                                            viewController);
-*/
+  viewer.rootContext()->setContextProperty("cppFolderSet",
+                                           &folderSet);
 
   viewer.setSource(QUrl("qrc:/main.qml"));
   viewer.setResizeMode(QQuickView::SizeRootObjectToView);

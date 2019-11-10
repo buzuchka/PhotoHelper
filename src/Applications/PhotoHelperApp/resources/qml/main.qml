@@ -4,4 +4,6 @@ import 'qrc:/PhotoHelper'
 
 InitialDialog {
     id: appWindow
+
+    folderSet: cppFolderSet
 }
