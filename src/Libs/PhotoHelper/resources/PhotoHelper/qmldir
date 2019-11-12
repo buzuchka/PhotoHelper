@@ -1,2 +1,3 @@
 module PhotoHelper
 InitialDialog 1.0 InitialDialog.qml
+OnePhotoWindow 1.0 OnePhotoWindow.qml

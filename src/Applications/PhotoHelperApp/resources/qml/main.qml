@@ -2,8 +2,9 @@ import QtQuick 2.11
 
 import 'qrc:/PhotoHelper'
 
-InitialDialog {
+OnePhotoWindow {
     id: appWindow
 
     folderSet: cppFolderSet
+    fileOperationHandler: cppFileOperationHandler
 }

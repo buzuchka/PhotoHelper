@@ -1,7 +1,10 @@
 #include <QApplication>
 
 #include <PhotoHelper/ConfigManager.h>
+#include <PhotoHelper/DestinationFolderModel.h>
+#include <PhotoHelper/FileOperationHandler.h>
 #include <PhotoHelper/FolderSet.h>
+#include <PhotoHelper/PhotoModel.h>
 
 #include <QStringList>
 
@@ -16,7 +19,11 @@ using namespace PhotoHelper;
 
 void qmlRegisterTypes()
 {
+  qmlRegisterType<DestinationFolderModel>("DestinationFolderModel", 1, 0,
+                                          "DestinationFolderModel");
+  qmlRegisterType<FileOperationHandler>("FileOperationHandler", 1, 0, "FileOperationHandler");
   qmlRegisterType<FolderSet>("FolderSet", 1, 0, "FolderSet");
+  qmlRegisterType<PhotoModel>("PhotoModel", 1, 0, "PhotoModel");
 }
 
 int main(int argc, char** argv)
@@ -33,6 +40,8 @@ int main(int argc, char** argv)
   Q_INIT_RESOURCE(PhotoHelper);
 
   auto *configManager = ConfigManager::getInstance();
+
+  FileOperationHandler operationHandler;
 
   FolderSet folderSet;
   folderSet.setSourcePath(configManager->getSourceFolderPair());
@@ -59,6 +68,8 @@ int main(int argc, char** argv)
 
   viewer.rootContext()->setContextProperty("cppFolderSet",
                                            &folderSet);
+  viewer.rootContext()->setContextProperty("cppFileOperationHandler",
+                                           &operationHandler);
 
   viewer.setSource(QUrl("qrc:/main.qml"));
   viewer.setResizeMode(QQuickView::SizeRootObjectToView);
