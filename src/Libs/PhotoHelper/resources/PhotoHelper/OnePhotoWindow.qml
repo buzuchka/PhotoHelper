@@ -1,4 +1,4 @@
-import QtQuick 2.0
+import QtQuick 2.5
 import QtQuick.Controls 2.12
 import QtQuick.Dialogs 1.3
 import QtQuick.Layouts 1.3
@@ -20,6 +20,24 @@ Window {
 
   property int buttonWidth: 200
   property int currentIndex: 0
+
+  Action {
+    id: nextPhotoAction
+    text: qsTr("Вперед")
+    shortcut: StandardKey.MoveToNextChar
+  }
+
+  Action {
+    id: prevPhotoAction
+    text: qsTr("Назад")
+    shortcut: StandardKey.MoveToPreviousChar
+  }
+
+  Action {
+    id: deletePhotoAction
+    text: qsTr("Удалить")
+    shortcut: StandardKey.Delete
+  }
 
   PhotoModel {
     id: photoModel
@@ -56,6 +74,7 @@ Window {
         text: qsTr("Вперед")
         implicitWidth: buttonWidth
         enabled: currentIndex < listPhotoView.count-1
+        action: nextPhotoAction
         onClicked: currentIndex++
       }
 
@@ -64,6 +83,7 @@ Window {
         text: qsTr("Назад")
         implicitWidth: buttonWidth
         enabled: currentIndex != 0
+        action: prevPhotoAction
         onClicked: currentIndex--
       }
 
@@ -71,6 +91,7 @@ Window {
         id: deleteButton
         text: qsTr("Удалить")
         implicitWidth: buttonWidth
+        action: deletePhotoAction
         onClicked: {
           cppFileOperationHandler.deleteFile(photoModel.getFilePath(currentIndex))
           photoModel.deleteItem(currentIndex)
