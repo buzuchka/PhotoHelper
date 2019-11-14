@@ -9,7 +9,7 @@ import FileOperationHandler 1.0
 import FolderSet 1.0
 import PhotoModel 1.0
 
-Item {
+Window {
   id: root
 
   width: 800

@@ -67,10 +67,16 @@ QString FolderSet::getDestinationPath(int index) const
   return m_destinationPathList.at(index).second;
 }
 
-void FolderSet::addDestinationPath(const QString &name,
+void FolderSet::setDestinationPath(int index,
+                                   const QString &name,
                                    const QString &path)
 {
-  m_destinationPathList.append({name, path});
+  if(index > m_destinationPathList.count()-1)
+    m_destinationPathList.append({name, path});
+  else {
+    m_destinationPathList[index].first=name;
+    m_destinationPathList[index].second=path;
+  }
   emit destinationPathListChanged();
 }
 

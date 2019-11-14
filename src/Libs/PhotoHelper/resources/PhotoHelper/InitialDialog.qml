@@ -5,18 +5,20 @@ import QtQuick.Layouts 1.3
 import QtQuick.Window 2.13
 
 import FolderSet 1.0
+import FileOperationHandler 1.0
 
-Item {
+Window {
   id: root
 
   property FolderSet folderSet
+  property FileOperationHandler fileOperationHandler
 
   property int firstColumnWidth: 200
 
   function saveModel(model, set) {
     for(var i = 0; i < model.count; ++i) {
       var listItem = model.get(i);
-      set.addDestinationPath(listItem.name, listItem.path)
+      set.setDestinationPath(i, listItem.name, listItem.path)
     }
   }
 
@@ -167,6 +169,15 @@ Item {
           folderSet.setSourcePath(sourceNameTextField.text,
                                   sourcePathTextField.text)
           saveModel(listModel, folderSet)
+
+          root.visible = false
+
+          var component = Qt.createComponent("OnePhotoWindow.qml")
+          var window    = component.createObject(root,
+                                                 {folderSet: root.folderSet,
+                                                  fileOperationHandler: root.fileOperationHandler,
+                                                  title: root.title})
+          window.show()
         }
       }
     }

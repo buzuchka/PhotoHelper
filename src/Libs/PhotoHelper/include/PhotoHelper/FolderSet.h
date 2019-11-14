@@ -34,8 +34,10 @@ public:
 
   Q_INVOKABLE QString getDestinationPath(int index) const;
   Q_INVOKABLE QString getDestinationName(int index) const;
-  Q_INVOKABLE void addDestinationPath(const QString &name,
+  Q_INVOKABLE void setDestinationPath(int index,
+                                      const QString &name,
                                       const QString &path);
+
   Q_INVOKABLE QVariantList getDestinationVariantList() const;
 
   Q_INVOKABLE FolderConfigList getDestinationPathList() const;

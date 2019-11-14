@@ -11,7 +11,7 @@
 #include <QtQuick/QQuickView>
 
 #include <QtQml/QQmlContext>
-#include <QtQml/QQmlEngine>
+#include <QtQml/QQmlApplicationEngine>
 
 #include <QImageReader>
 
@@ -59,21 +59,14 @@ int main(int argc, char** argv)
     configManager->setDestinationPathList(folderSet.getDestinationPathList());
   });
 
-  QQuickView viewer;
+  QQmlApplicationEngine engine;
 
-  QObject::connect(viewer.engine(), &QQmlEngine::quit,
-                   &viewer, &QWindow::close);
-
-  viewer.setTitle(QStringLiteral("QML Photo Helper"));
-
-  viewer.rootContext()->setContextProperty("cppFolderSet",
+  engine.rootContext()->setContextProperty("cppFolderSet",
                                            &folderSet);
-  viewer.rootContext()->setContextProperty("cppFileOperationHandler",
+  engine.rootContext()->setContextProperty("cppFileOperationHandler",
                                            &operationHandler);
 
-  viewer.setSource(QUrl("qrc:/main.qml"));
-  viewer.setResizeMode(QQuickView::SizeRootObjectToView);
-  viewer.show();
+  engine.load(QUrl("qrc:/main.qml"));
 
   return app.exec();
 }
