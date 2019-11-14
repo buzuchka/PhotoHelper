@@ -21,7 +21,8 @@ void qmlRegisterTypes()
 {
   qmlRegisterType<DestinationFolderModel>("DestinationFolderModel", 1, 0,
                                           "DestinationFolderModel");
-  qmlRegisterType<FileOperationHandler>("FileOperationHandler", 1, 0, "FileOperationHandler");
+  qmlRegisterType<FileOperationHandler>("FileOperationHandler", 1, 0,
+                                        "FileOperationHandler");
   qmlRegisterType<FolderSet>("FolderSet", 1, 0, "FolderSet");
   qmlRegisterType<PhotoModel>("PhotoModel", 1, 0, "PhotoModel");
 }

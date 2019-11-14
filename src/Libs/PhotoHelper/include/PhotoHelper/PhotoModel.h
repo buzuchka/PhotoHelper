@@ -20,9 +20,6 @@ public:
   QStringList data() const;
   Q_INVOKABLE void setData(const QStringList &data);
 
-  //! Загрузка данных в модель
-  //Q_INVOKABLE void init();
-
   //! Удаление элемента
   Q_INVOKABLE void deleteItem(int index);
 

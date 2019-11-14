@@ -21,24 +21,6 @@ Window {
   property int buttonWidth: 200
   property int currentIndex: 0
 
-  Action {
-    id: nextPhotoAction
-    text: qsTr("Вперед")
-    shortcut: StandardKey.MoveToNextChar
-  }
-
-  Action {
-    id: prevPhotoAction
-    text: qsTr("Назад")
-    shortcut: StandardKey.MoveToPreviousChar
-  }
-
-  Action {
-    id: deletePhotoAction
-    text: qsTr("Удалить")
-    shortcut: StandardKey.Delete
-  }
-
   PhotoModel {
     id: photoModel
   }
@@ -74,7 +56,10 @@ Window {
         text: qsTr("Вперед")
         implicitWidth: buttonWidth
         enabled: currentIndex < listPhotoView.count-1
-        action: nextPhotoAction
+        action: Action {
+          text: qsTr("Вперед")
+          shortcut: StandardKey.MoveToNextChar
+        }
         onClicked: currentIndex++
       }
 
@@ -83,7 +68,10 @@ Window {
         text: qsTr("Назад")
         implicitWidth: buttonWidth
         enabled: currentIndex != 0
-        action: prevPhotoAction
+        action: Action {
+          text: qsTr("Назад")
+          shortcut: StandardKey.MoveToPreviousChar
+        }
         onClicked: currentIndex--
       }
 
@@ -91,7 +79,10 @@ Window {
         id: deleteButton
         text: qsTr("Удалить")
         implicitWidth: buttonWidth
-        action: deletePhotoAction
+        action: Action {
+          text: qsTr("Удалить")
+          shortcut: StandardKey.Delete
+        }
         onClicked: {
           cppFileOperationHandler.deleteFile(photoModel.getFilePath(currentIndex))
           photoModel.deleteItem(currentIndex)
@@ -113,9 +104,13 @@ Window {
         delegate: Button {
           implicitWidth: buttonWidth
           text: model.name
-          onClicked: fileOperationHandler.copyFile(
+          action: Action {
+            text: model.name
+            shortcut: "Ctrl+"+(index+1)
+          }
+          onClicked: {fileOperationHandler.copyFile(
                        photoModel.getFilePath(currentIndex),
-                       model.path)
+                       model.path)}
         }
         model: DestinationFolderModel {
           id: destinationModel
