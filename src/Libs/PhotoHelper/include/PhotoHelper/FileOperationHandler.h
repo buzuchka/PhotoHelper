@@ -18,8 +18,12 @@ public:
   FileOperationHandler();
 
   //! Копирование файла filePath в папку destinationPath
+  //! filePath - путь до файла, который копируем
+  //! destinationPath - путь назначения
+  //! destinationFileName - имя файла назначения с расширением
   Q_INVOKABLE void copyFile(const QString &filePath,
-                            const QString &destinationPath);
+                            const QString &destinationPath,
+                            const QString &destinationFileName = QString());
 
   Q_INVOKABLE void deleteFile(const QString &filePath);
 
