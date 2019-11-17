@@ -17,12 +17,8 @@ QStringList PhotoModel::data() const
 void PhotoModel::setData(const QStringList &pathList)
 {
   auto data = pathList;
-  for(QString & path : data) {
-    if(!path.startsWith("file///"))
-      path.prepend("file:///");
-  }
 
-  m_data = data;
+  m_data = pathList;
   emit dataChanged();
 }
 
@@ -34,8 +30,7 @@ void PhotoModel::deleteItem(int index)
 
 QString PhotoModel::getFilePath(int index)
 {
-  QString path = m_data.at(index);
-  return path.replace("file:///","");
+  return m_data.at(index);
 }
 
 } // !PhotoHelper

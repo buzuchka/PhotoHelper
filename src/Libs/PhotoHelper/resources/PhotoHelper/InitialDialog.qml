@@ -210,8 +210,12 @@ Window {
     folder: shortcuts.home
 
     onAccepted: {
-      sourcePathTextField.text =
-          sourceFolderDialog.fileUrl.toString().replace("file:///","")
+      var fileUrlString = sourceFolderDialog.fileUrl.toString()
+      if(fileUrlString.startsWith("file:///"))
+        fileUrlString = fileUrlString.replace("file:///","")
+      if(fileUrlString.startsWith("file://"))
+        fileUrlString = fileUrlString.replace("file:","")
+      sourcePathTextField.text = fileUrlString
       close()
     }
     onRejected: {
@@ -230,8 +234,12 @@ Window {
     folder: shortcuts.home
 
     onAccepted: {
-      listModel.get(clickedIndex).path =
-          destinationFolderDialog.fileUrl.toString().replace("file:///","")
+      var fileUrlString = destinationFolderDialog.fileUrl.toString()
+      if(fileUrlString.startsWith("file:///"))
+        fileUrlString = fileUrlString.replace("file:///","")
+      if(fileUrlString.startsWith("file://"))
+        fileUrlString = fileUrlString.replace("file:","")
+      listModel.get(clickedIndex).path = fileUrlString
       close()
     }
     onRejected: {

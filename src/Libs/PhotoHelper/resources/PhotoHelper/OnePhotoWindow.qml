@@ -44,7 +44,7 @@ Window {
 
       cache: false
       fillMode: Image.PreserveAspectFit;
-      source: listPhotoView.model[currentIndex]
+      Component.onCompleted: source = "file:" + listPhotoView.model[currentIndex]
     }
 
 
