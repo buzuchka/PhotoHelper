@@ -26,8 +26,8 @@ void FileOperationHandler::copyFile(const QString &filePath,
   {
     QFileInfo toFileInfo(toFilePath);
     // Если это один и тот же файл, выходим
-    if(fromFileInfo.size() == toFileInfo.size() &&
-       fromFileInfo.birthTime() == toFileInfo.birthTime())
+    if((fromFileInfo.size() == toFileInfo.size()) &&
+       (fromFileInfo.lastModified() == toFileInfo.lastModified()))
       return;
     else
     {
@@ -77,7 +77,7 @@ QStringList FileOperationHandler::getImagesPathList(const QString &path)
         QDir::Files | QDir::NoSymLinks | QDir::NoDotAndDotDot);
 
   for(auto & name : nameList)
-    name.prepend(path + "/");
+    name.prepend(path + QDir::separator());
 
   return nameList;
 }
