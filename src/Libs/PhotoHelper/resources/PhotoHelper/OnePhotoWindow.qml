@@ -46,6 +46,8 @@ Window {
       fillMode: Image.PreserveAspectFit;
       source: if(currentIndex >= 0)
                 "file:" + listPhotoView.model[currentIndex]
+
+      rotation: 0
     }
 
 
@@ -61,7 +63,10 @@ Window {
           text: qsTr("Вперед")
           shortcut: StandardKey.MoveToNextChar
         }
-        onClicked: currentIndex++
+        onClicked: {
+          photo.rotation = 0
+          currentIndex++
+        }
       }
 
       Button {
@@ -73,7 +78,10 @@ Window {
           text: qsTr("Назад")
           shortcut: StandardKey.MoveToPreviousChar
         }
-        onClicked: currentIndex--
+        onClicked: {
+          photo.rotation = 0
+          currentIndex--
+        }
       }
 
       Button {
@@ -85,8 +93,19 @@ Window {
           shortcut: StandardKey.Delete
         }
         onClicked: {
+          photo.rotation = 0
           cppFileOperationHandler.deleteFile(photoModel.getFilePath(currentIndex))
           photoModel.deleteItem(currentIndex)
+        }
+      }
+
+      Button {
+        id: rotateButton
+        Layout.topMargin: 30
+        text: qsTr("Повернуть")
+        implicitWidth: buttonWidth
+        onClicked: {
+          photo.rotation += 90
         }
       }
 
