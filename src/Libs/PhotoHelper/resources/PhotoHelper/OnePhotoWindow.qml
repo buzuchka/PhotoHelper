@@ -19,7 +19,7 @@ Window {
   property FileOperationHandler fileOperationHandler
 
   property int buttonWidth: 200
-  property int currentIndex: 0
+  property int currentIndex: -1
 
   PhotoModel {
     id: photoModel
@@ -44,7 +44,7 @@ Window {
 
       cache: false
       fillMode: Image.PreserveAspectFit;
-      source: if(listPhotoView.model[currentIndex])
+      source: if(currentIndex >= 0)
                 "file:" + listPhotoView.model[currentIndex]
     }
 
@@ -87,11 +87,6 @@ Window {
         onClicked: {
           cppFileOperationHandler.deleteFile(photoModel.getFilePath(currentIndex))
           photoModel.deleteItem(currentIndex)
-
-          if(currentIndex < listPhotoView.count-1)
-            currentIndex++
-          else if(listPhotoView.count > 0)
-            currentIndex--
         }
       }
 
@@ -123,5 +118,8 @@ Window {
   Component.onCompleted: {
     photoModel.setData(fileOperationHandler.getImagesPathList(folderSet.sourcePath))
     destinationModel.init()
+
+    if (listPhotoView.count > 0)
+      currentIndex = 0
   }
 }
