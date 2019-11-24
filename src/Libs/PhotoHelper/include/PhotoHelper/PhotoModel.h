@@ -26,6 +26,9 @@ public:
   //! Возвращает путь по индексу
   Q_INVOKABLE QString getFilePath(int index);
 
+  //! Возвращает имя файла по индексу
+  Q_INVOKABLE QString getFileName(int index);
+
 signals:
   void dataChanged();
 

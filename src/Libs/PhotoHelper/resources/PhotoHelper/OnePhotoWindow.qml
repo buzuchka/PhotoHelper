@@ -36,20 +36,44 @@ Window {
     anchors.fill: parent
     anchors.margins: 10
 
-    Image {
-      id: photo
-
+    ColumnLayout {
       Layout.fillWidth: true
       Layout.fillHeight: true
 
-      cache: false
-      fillMode: Image.PreserveAspectFit;
-      source: if(currentIndex >= 0)
-                "file:" + listPhotoView.model[currentIndex]
+      Image {
+        id: photo
 
-      rotation: 0
+        Layout.fillWidth: true
+        height: parent.height - 50
+        Layout.fillHeight: true
+
+        cache: false
+        fillMode: Image.PreserveAspectFit;
+        source: if(currentIndex >= 0)
+                  "file:" + listPhotoView.model[currentIndex]
+
+        rotation: 0
+
+        clip: true
+      }
+
+      RowLayout {
+        anchors.margins: 10
+        spacing: 50
+
+        Layout.fillWidth: true
+
+        Text {
+          visible: currentIndex >= 0 ? true : false
+          text: (currentIndex + 1) + " / " + listPhotoView.count
+        }
+
+        Text {
+          visible: currentIndex >= 0 ? true : false
+          text: photoModel.getFileName(currentIndex)
+        }
+      }
     }
-
 
     ColumnLayout {
       Layout.fillHeight: true

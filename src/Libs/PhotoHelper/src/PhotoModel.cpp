@@ -30,7 +30,19 @@ void PhotoModel::deleteItem(int index)
 
 QString PhotoModel::getFilePath(int index)
 {
+  if(index < 0)
+    return QString();
+
   return m_data.at(index);
+}
+
+QString PhotoModel::getFileName(int index)
+{
+  if(index < 0)
+    return QString();
+
+  QFileInfo fileInfo(m_data.at(index));
+  return fileInfo.fileName();
 }
 
 } // !PhotoHelper
