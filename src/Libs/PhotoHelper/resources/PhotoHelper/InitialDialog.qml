@@ -94,6 +94,10 @@ Window {
             implicitWidth: firstColumnWidth
 
             text: model.name
+            color: acceptableInput ? "black" : "red"
+            validator: RegExpValidator {
+              regExp: /[a-zA-Z0-9а-яА-я]{1,20}/
+            }
             placeholderText: qsTr("Введите имя")
             onEditingFinished: listModel.get(index).name = text
           }
