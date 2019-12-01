@@ -176,7 +176,7 @@ Window {
 
           root.visible = false
 
-          var component = Qt.createComponent("OnePhotoWindow.qml")
+          var component = Qt.createComponent("MainWindow.qml")
           var window    = component.createObject(root,
                                                  {folderSet: root.folderSet,
                                                   fileOperationHandler: root.fileOperationHandler,
@@ -211,7 +211,9 @@ Window {
     title: qsTr("Выберите папку")
     selectFolder: true
     selectMultiple: false
-    folder: shortcuts.home
+    folder: (sourcePathTextField.text.length != 0) ?
+              sourcePathTextField.text :
+              shortcuts.home
 
     onAccepted: {
       var fileUrlString = sourceFolderDialog.fileUrl.toString()
