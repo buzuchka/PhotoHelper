@@ -14,7 +14,8 @@ class PHOTOHELPER_EXPORT PhotoModel : public QAbstractListModel
 public:
   enum Roles {
       NameRole = Qt::UserRole + 1,
-      PathRole
+      PathRole,
+      SelectedRole
   };
 
   PhotoModel(QObject *parent = nullptr);
@@ -24,6 +25,8 @@ public:
   QHash<int, QByteArray> roleNames() const override;
 
   Q_INVOKABLE void setData(const QStringList &data);
+
+  Q_INVOKABLE void setSelectedIndexes(QList<int> const& indexes);
 
   //! Удаление элемента
   Q_INVOKABLE void deleteItem(int index);
@@ -36,6 +39,7 @@ public:
 
 private:
   QStringList m_data;
+  QList<int> m_selectedIndexes;
 };
 
 } // !PhotoHelper

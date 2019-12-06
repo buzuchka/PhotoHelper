@@ -29,6 +29,8 @@ QVariant PhotoModel::data(const QModelIndex &index, int role) const
       return QFileInfo(m_data.at(index.row())).fileName();
   case PathRole:
       return m_data.at(index.row());
+  case SelectedRole:
+    return m_selectedIndexes.contains(index.row());
   default:
       return QVariant();
   }
@@ -39,6 +41,7 @@ QHash<int, QByteArray> PhotoModel::roleNames() const
   QHash<int, QByteArray> roles = QAbstractListModel::roleNames();
   roles[NameRole] = "name";
   roles[PathRole] = "path";
+  roles[SelectedRole] = "selected";
 
   return roles;
 }
@@ -52,6 +55,11 @@ void PhotoModel::setData(const QStringList &pathList)
 
   QModelIndex index = createIndex(0, 0, static_cast<void *>(0));
   emit dataChanged(index, index);
+}
+
+void PhotoModel::setSelectedIndexes(const QList<int> &indexes)
+{
+  m_selectedIndexes = indexes;
 }
 
 void PhotoModel::deleteItem(int index)
