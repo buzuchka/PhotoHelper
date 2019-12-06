@@ -3,21 +3,26 @@
 
 #include <photohelper_export.h>
 
-#include <QObject>
+#include <QAbstractListModel>
 #include <QStringList>
 
 namespace PhotoHelper {
 
-class PHOTOHELPER_EXPORT PhotoModel : public QObject
+class PHOTOHELPER_EXPORT PhotoModel : public QAbstractListModel
 {
   Q_OBJECT
-  Q_PROPERTY(QStringList data
-             READ data
-             NOTIFY dataChanged)
 public:
+  enum Roles {
+      NameRole = Qt::UserRole + 1,
+      PathRole
+  };
+
   PhotoModel(QObject *parent = nullptr);
 
-  QStringList data() const;
+  int rowCount(const QModelIndex &parent) const override;
+  QVariant data(const QModelIndex &index, int role) const override;
+  QHash<int, QByteArray> roleNames() const override;
+
   Q_INVOKABLE void setData(const QStringList &data);
 
   //! Удаление элемента
@@ -28,9 +33,6 @@ public:
 
   //! Возвращает имя файла по индексу
   Q_INVOKABLE QString getFileName(int index);
-
-signals:
-  void dataChanged();
 
 private:
   QStringList m_data;

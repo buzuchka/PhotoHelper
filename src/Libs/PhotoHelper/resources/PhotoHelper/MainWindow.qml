@@ -41,7 +41,7 @@ Window {
 
   ListView {
     id: listPhotoView
-    model: photoModel.data
+    model: photoModel
     delegate: Text {}
     visible: false
   }
@@ -125,7 +125,7 @@ Window {
 
           text: "All"
           enabled: !loader.source.toString().includes("AllPhotoItem.qml")
-          onClicked: loader.setSource("AllPhotoItem.qml")
+          onClicked: loader.setSource("AllPhotoItem.qml", {"model": photoModel})
         }
       }
 

@@ -1,31 +1,65 @@
 #include "PhotoModel.h"
 
 #include <QDir>
+#include <QFileInfo>
 
 namespace PhotoHelper {
 
 PhotoModel::PhotoModel(QObject *parent)
-  : QObject(parent)
+  : QAbstractListModel(parent)
 {
 }
 
-QStringList PhotoModel::data() const
+int PhotoModel::rowCount(const QModelIndex &parent) const
 {
-  return m_data;
+  if (parent.isValid())
+    return 0;
+
+  return m_data.size();
+}
+
+QVariant PhotoModel::data(const QModelIndex &index, int role) const
+{
+  if (!index.isValid()) {
+      return QVariant();
+  }
+
+  switch (role) {
+  case NameRole:
+      return QFileInfo(m_data.at(index.row())).fileName();
+  case PathRole:
+      return m_data.at(index.row());
+  default:
+      return QVariant();
+  }
+}
+
+QHash<int, QByteArray> PhotoModel::roleNames() const
+{
+  QHash<int, QByteArray> roles = QAbstractListModel::roleNames();
+  roles[NameRole] = "name";
+  roles[PathRole] = "path";
+
+  return roles;
 }
 
 void PhotoModel::setData(const QStringList &pathList)
 {
+  beginInsertRows(QModelIndex(), m_data.size(), m_data.size());
   auto data = pathList;
-
   m_data = pathList;
-  emit dataChanged();
+  endInsertRows();
+
+  QModelIndex index = createIndex(0, 0, static_cast<void *>(0));
+  emit dataChanged(index, index);
 }
 
 void PhotoModel::deleteItem(int index)
 {
   m_data.removeAt(index);
-  emit dataChanged();
+
+  QModelIndex ind = createIndex(index, 0, static_cast<void *>(0));
+  emit dataChanged(ind, ind);
 }
 
 QString PhotoModel::getFilePath(int index)
