@@ -54,11 +54,27 @@ Window {
       Layout.fillWidth: true
       Layout.fillHeight: true
 
+      Text {
+        Layout.fillWidth: true
+        Layout.fillHeight: true
+        Layout.alignment: Qt.AlignCenter
+
+        visible: listPhotoView.count == 0
+        text: qsTr("Нет изображений")
+        color: "gray"
+        font.pointSize: 20
+        textFormat: Text.PlainText
+        horizontalAlignment: Text.AlignHCenter
+        verticalAlignment: Text.AlignVCenter
+      }
+
       Loader {
         id: loader
 
         Layout.fillWidth: true
         Layout.fillHeight: true
+
+        visible: listPhotoView.count != 0
       }
 
       RowLayout {
