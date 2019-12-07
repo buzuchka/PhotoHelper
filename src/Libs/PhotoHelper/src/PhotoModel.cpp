@@ -62,10 +62,9 @@ void PhotoModel::setSelectedIndexes(const QList<int> &indexes)
 
 void PhotoModel::deleteItem(int index)
 {
-  //m_data.removeAt(index);
-
-  //QModelIndex ind = createIndex(index, 0, static_cast<void *>(0));
-  //emit dataChanged(ind, ind);
+  beginRemoveRows(QModelIndex(), index, index);
+  m_data.removeAt(index);
+  endRemoveRows();
 }
 
 void PhotoModel::deleteItems(const QList<int> &indexes)

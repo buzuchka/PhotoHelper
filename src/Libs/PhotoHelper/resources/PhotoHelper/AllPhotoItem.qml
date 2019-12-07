@@ -5,6 +5,7 @@ Item {
   id: root
 
   property var photoModel
+  property var fileOperationHandler
 
   property int photoSize: 200
   property int photoSpacing: 10
@@ -13,9 +14,16 @@ Item {
   property int previousIndex: -1
   property int updateCounter: 0 // for force re-evaliation of values in delegates
 
+  ListView {
+    id: photoListView
+    model: photoModel
+    delegate: Text {}
+    visible: false
+  }
+
   function copyPhoto(path) {
     if(selectedIndexes.length > 0) {
-      cppFileOperationHandler.copyFiles(
+      fileOperationHandler.copyFiles(
             photoModel.getFilePathList(selectedIndexes),
             path)
     }
@@ -23,7 +31,7 @@ Item {
 
   function deletePhoto() {
     if(selectedIndexes.length > 0) {
-      cppFileOperationHandler.deleteFiles(
+      fileOperationHandler.deleteFiles(
             photoModel.getFilePathList(selectedIndexes))
       photoModel.deleteItems(selectedIndexes)
       console.log(selectedIndexes)
@@ -49,77 +57,97 @@ Item {
       photoModel.setSelectedIndexes(selectedIndexes)
   }
 
-  GridView {
-    id: view
-
+  ColumnLayout {
     anchors.fill: parent
 
-    cellWidth: photoSize
-    cellHeight: cellWidth
+    GridView {
+      id: view
 
-    clip: true
-    focus: true
+      Layout.fillWidth: true
+      Layout.fillHeight: true
 
-    model: photoModel
+      cellWidth: photoSize
+      cellHeight: cellWidth
 
-    delegate:  Item {
-      id: photoDelegate
+      clip: true
+      focus: true
 
-      width: GridView.view.cellWidth
-      height: GridView.view.cellHeight
+      model: photoModel
 
-      Rectangle {
-        property bool isSelected: updateCounter && model.selected
+      delegate:  Item {
+        id: photoDelegate
 
-        anchors.fill: parent
-        color: "lightsteelblue";
-        visible: isSelected
+        width: GridView.view.cellWidth
+        height: GridView.view.cellHeight
+
+        Rectangle {
+          property bool isSelected: updateCounter && model.selected
+
+          anchors.fill: parent
+          color: "lightsteelblue";
+          visible: isSelected
+        }
+
+        ColumnLayout {
+          anchors.fill: parent
+          anchors.margins: photoSpacing
+
+          Image {
+            id: photo
+
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+
+            verticalAlignment: Image.AlignBottom
+
+            cache: false
+            fillMode: Image.PreserveAspectFit;
+            source: "file:" + model.path
+          }
+
+          Text {
+            id: contactInfo
+
+            Layout.fillWidth: true
+
+            text: model.name
+            horizontalAlignment: Text.AlignHCenter
+          }
+        }
+
+        MouseArea {
+          anchors.fill: parent
+          onClicked: {
+            if (mouse.modifiers & Qt.ShiftModifier) {
+              setRowRange(true, previousIndex, index)
+            } else {
+              var hasIndex = selectedIndexes.indexOf(index) !== -1
+              if (mouse.modifiers & Qt.ControlModifier) {
+                setRowRange(!hasIndex, index, index)
+              } else {
+                selectedIndexes = (selectedIndexes.length == 1 && hasIndex) ? [] : [index]
+                photoModel.setSelectedIndexes(selectedIndexes)
+              }
+            }
+            previousIndex = index
+            updateCounter++
+          }
+        }
       }
+    }
 
-      ColumnLayout {
-        anchors.fill: parent
-        anchors.margins: photoSpacing
+    RowLayout {
+      Layout.fillWidth: true
+      Layout.fillHeight: true
 
-        Image {
-          id: photo
+      Layout.maximumHeight: 50
 
+      Text {
           Layout.fillWidth: true
           Layout.fillHeight: true
+          verticalAlignment: Text.AlignVCenter
 
-          verticalAlignment: Image.AlignBottom
-
-          cache: false
-          fillMode: Image.PreserveAspectFit;
-          source: "file:" + model.path
-        }
-
-        Text {
-          id: contactInfo
-
-          Layout.fillWidth: true
-
-          text: model.name
-          horizontalAlignment: Text.AlignHCenter
-        }
-      }
-
-      MouseArea {
-        anchors.fill: parent
-        onClicked: {
-          if (mouse.modifiers & Qt.ShiftModifier) {
-            setRowRange(true, previousIndex, index)
-          } else {
-            var hasIndex = selectedIndexes.indexOf(index) !== -1
-            if (mouse.modifiers & Qt.ControlModifier) {
-              setRowRange(!hasIndex, index, index)
-            } else {
-              selectedIndexes = (selectedIndexes.length == 1 && hasIndex) ? [] : [index]
-              photoModel.setSelectedIndexes(selectedIndexes)
-            }
-          }
-          previousIndex = index
-          updateCounter++
-        }
+          text: photoListView.count + " " + qsTr("фото")
       }
     }
   }

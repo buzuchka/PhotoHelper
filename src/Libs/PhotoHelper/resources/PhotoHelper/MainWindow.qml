@@ -16,20 +16,15 @@ Window {
 
   property int buttonWidth: 200
   property int buttonMargin: 50
+
   property int currentIndex: -1
 
-  function updatePhotoByIndex (){
-    if(!loader.source.toString().includes("OnePhotoItem.qml"))
-      return;
-    if(currentIndex >=0)
-      loader.item.photoFilePath = listPhotoView.model[currentIndex]
+  function isCurrentOnePhotoItem() {
+    return loader.source.toString().includes("OnePhotoItem.qml")
   }
 
-  function resetRotation() {
-    if(!loader.source.toString().includes("OnePhotoItem.qml"))
-      return;
-    if(currentIndex >=0)
-      loader.item.rotation = 0
+  function isCurrentAllPhotoItem() {
+    return loader.source.toString().includes("AllPhotoItem.qml")
   }
 
   width: 800
@@ -40,7 +35,7 @@ Window {
   }
 
   ListView {
-    id: listPhotoView
+    id: photoListView
     model: photoModel
     delegate: Text {}
     visible: false
@@ -59,7 +54,7 @@ Window {
         Layout.fillHeight: true
         Layout.alignment: Qt.AlignCenter
 
-        visible: listPhotoView.count == 0
+        visible: photoListView.count == 0
         text: qsTr("Нет изображений")
         color: "gray"
         font.pointSize: 20
@@ -74,42 +69,8 @@ Window {
         Layout.fillWidth: true
         Layout.fillHeight: true
 
-        visible: listPhotoView.count != 0
-      }
-
-      RowLayout {
-        Layout.fillWidth: true
-        Layout.fillHeight: true
-
-        Layout.maximumHeight: 50
-
-        Item {
-          Layout.fillWidth: true
-          Layout.fillHeight: true
-
-          Text {
-            anchors.fill: parent
-            verticalAlignment: Text.AlignVCenter
-
-            visible: currentIndex >= 0 ? true : false
-            text: (currentIndex + 1) + " / " + listPhotoView.count
-          }
-        }
-
-        Item {
-          Layout.fillWidth: true
-          Layout.fillHeight: true
-
-          Text {
-            anchors.fill: parent
-            verticalAlignment: Text.AlignVCenter
-            horizontalAlignment: Text.AlignRight
-
-            visible: currentIndex >= 0
-            text: photoModel.getFileName(currentIndex)
-          }
-        }
-      }
+        visible: photoListView.count != 0
+      }      
     }
 
     ColumnLayout {
@@ -128,20 +89,20 @@ Window {
           Layout.fillWidth: true
 
           text: "One"
-          enabled: !loader.source.toString().includes("OnePhotoItem.qml")
-//            onClicked: loader.setSource("Fragment3.qml", {"opacity": 0.5})
-          onClicked: {
-            loader.setSource("OnePhotoItem.qml")
-            updatePhotoByIndex()
-          }
+          enabled: isCurrentAllPhotoItem()
+          onClicked: loader.setSource("OnePhotoItem.qml",
+                                      {"photoModel": photoModel,
+                                       "fileOperationHandler": fileOperationHandler})
         }
 
         Button {
           Layout.fillWidth: true
 
           text: "All"
-          enabled: !loader.source.toString().includes("AllPhotoItem.qml")
-          onClicked: loader.setSource("AllPhotoItem.qml", {"photoModel": photoModel})
+          enabled:isCurrentOnePhotoItem()
+          onClicked: loader.setSource("AllPhotoItem.qml",
+                                      {"photoModel": photoModel,
+                                       "fileOperationHandler": fileOperationHandler})
         }
       }
 
@@ -151,10 +112,6 @@ Window {
         Layout.fillWidth: true
 
         text: qsTr("Повернуть")
-        enabled: currentIndex > 0
-        onClicked: {
-          photo.rotation += 90
-        }
       }
 
       Button {
@@ -163,18 +120,12 @@ Window {
         Layout.fillWidth: true
 
         text: qsTr("Удалить")
-        enabled: currentIndex >= 0
+        enabled: photoListView.count > 0
         action: Action {
           text: qsTr("Удалить")
           shortcut: StandardKey.Delete
         }
-        onClicked: {
-          loader.item.deletePhoto()
-          //resetRotation()
-          //cppFileOperationHandler.deleteFile(photoModel.getFilePath(currentIndex))
-          //photoModel.deleteItem(currentIndex)
-          //updatePhotoByIndex()
-        }
+        onClicked: loader.item.deletePhoto()
       }
 
       ListView {
@@ -190,12 +141,7 @@ Window {
             text: model.name
             shortcut: "Ctrl+"+(index+1)
           }
-          onClicked: {
-            loader.item.copyPhoto(model.path)
-            //fileOperationHandler.copyFile(
-            //      photoModel.getFilePath(currentIndex),
-            //      model.path)
-          }
+          onClicked: loader.item.copyPhoto(model.path)
         }
         model: DestinationFolderModel {
           id: destinationModel
@@ -208,16 +154,12 @@ Window {
         Layout.fillWidth: true
 
         text: qsTr("Вперед")
-        enabled: currentIndex < listPhotoView.count-1
+        enabled: currentIndex < photoListView.count-1
         action: Action {
           text: qsTr("Вперед")
           shortcut: StandardKey.MoveToNextChar
         }
-        onClicked: {
-          resetRotation()
-          currentIndex++
-          updatePhotoByIndex()
-        }
+        onClicked: currentIndex++
       }
 
       Button {
@@ -231,11 +173,7 @@ Window {
           text: qsTr("Назад")
           shortcut: StandardKey.MoveToPreviousChar
         }
-        onClicked: {
-          resetRotation()
-          currentIndex--
-          updatePhotoByIndex()
-        }
+        onClicked: currentIndex--
       }
     }
   }
@@ -243,10 +181,11 @@ Window {
     photoModel.setData(fileOperationHandler.getImagesPathList(folderSet.sourcePath))
     destinationModel.init()
 
-    if (listPhotoView.count > 0) {
-      loader.setSource("OnePhotoItem.qml")
+    if (photoListView.count > 0) {
+      loader.setSource("OnePhotoItem.qml",
+                       {"photoModel": photoModel,
+                        "fileOperationHandler": fileOperationHandler})
       currentIndex = 0
-      updatePhotoByIndex()
     }
   }
 }
