@@ -190,9 +190,12 @@ Window {
             text: model.name
             shortcut: "Ctrl+"+(index+1)
           }
-          onClicked: {fileOperationHandler.copyFile(
-                       photoModel.getFilePath(currentIndex),
-                       model.path)}
+          onClicked: {
+            loader.item.copyPhoto(model.path)
+            //fileOperationHandler.copyFile(
+            //      photoModel.getFilePath(currentIndex),
+            //      model.path)
+          }
         }
         model: DestinationFolderModel {
           id: destinationModel

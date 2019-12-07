@@ -13,9 +13,18 @@ Item {
   property int previousIndex: -1
   property int updateCounter: 0 // for force re-evaliation of values in delegates
 
+  function copyPhoto(path) {
+    if(selectedIndexes.length > 0) {
+      cppFileOperationHandler.copyFiles(
+            photoModel.getFilePathList(selectedIndexes),
+            path)
+    }
+  }
+
   function deletePhoto() {
     if(selectedIndexes.length > 0) {
-      cppFileOperationHandler.deleteFiles(photoModel.getFilePathList(selectedIndexes))
+      cppFileOperationHandler.deleteFiles(
+            photoModel.getFilePathList(selectedIndexes))
       photoModel.deleteItems(selectedIndexes)
       console.log(selectedIndexes)
       selectedIndexes = []

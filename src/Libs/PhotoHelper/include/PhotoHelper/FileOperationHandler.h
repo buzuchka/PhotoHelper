@@ -25,6 +25,9 @@ public:
                             const QString &destinationPath,
                             const QString &destinationFileName = QString());
 
+  Q_INVOKABLE void copyFiles(const QStringList &filePathList,
+                             const QString &destinationPath);
+
   Q_INVOKABLE void deleteFile(const QString &filePath);
   Q_INVOKABLE void deleteFiles(const QStringList &filePathList);
 

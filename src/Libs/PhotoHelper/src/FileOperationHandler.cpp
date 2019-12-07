@@ -54,15 +54,20 @@ void FileOperationHandler::copyFile(const QString &filePath,
       else {
         copyFile(filePath,
                  destinationPath,
-                 (oldFileName +
-                  " (2)." +
-                  toFileInfo.suffix()));
+                 (oldFileName + " (2)." + toFileInfo.suffix()));
         return;
       }
     }
   }
 
   QFile::copy(filePath, toFilePath);
+}
+
+void FileOperationHandler::copyFiles(const QStringList &filePathList,
+                                     const QString &destinationPath)
+{
+  for(auto const& filePath : filePathList)
+    copyFile(filePath, destinationPath);
 }
 
 void FileOperationHandler::deleteFile(const QString &filePath)
