@@ -4,7 +4,7 @@ import QtQuick.Layouts 1.13
 Item {
   id: root
 
-  property var model
+  property var photoModel
 
   property int photoSize: 200
   property int photoSpacing: 10
@@ -12,6 +12,17 @@ Item {
   property var selectedIndexes: []
   property int previousIndex: -1
   property int updateCounter: 0 // for force re-evaliation of values in delegates
+
+  function deletePhoto() {
+    if(selectedIndexes.length > 0) {
+      cppFileOperationHandler.deleteFiles(photoModel.getFilePathList(selectedIndexes))
+      photoModel.deleteItems(selectedIndexes)
+      console.log(selectedIndexes)
+      selectedIndexes = []
+      photoModel.setSelectedIndexes(selectedIndexes)
+      updateCounter++
+    }
+  }
 
   function setRowRange(select, first, last) {
       var start = first <= last ? first : last
@@ -26,7 +37,7 @@ Item {
                   selectedIndexes.splice(indexAt, 1);
           }
       }
-      model.setSelectedIndexes(selectedIndexes)
+      photoModel.setSelectedIndexes(selectedIndexes)
   }
 
   GridView {
@@ -40,15 +51,13 @@ Item {
     clip: true
     focus: true
 
-    model: root.model
+    model: photoModel
 
     delegate:  Item {
       id: photoDelegate
 
-      property var view: GridView.view
-
-      width: view.cellWidth
-      height: view.cellHeight
+      width: GridView.view.cellWidth
+      height: GridView.view.cellHeight
 
       Rectangle {
         property bool isSelected: updateCounter && model.selected
@@ -96,7 +105,7 @@ Item {
               setRowRange(!hasIndex, index, index)
             } else {
               selectedIndexes = (selectedIndexes.length == 1 && hasIndex) ? [] : [index]
-              root.model.setSelectedIndexes(selectedIndexes)
+              photoModel.setSelectedIndexes(selectedIndexes)
             }
           }
           previousIndex = index

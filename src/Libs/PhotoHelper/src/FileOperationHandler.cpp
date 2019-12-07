@@ -70,6 +70,12 @@ void FileOperationHandler::deleteFile(const QString &filePath)
   QFile::remove(filePath);
 }
 
+void FileOperationHandler::deleteFiles(const QStringList &filePathList)
+{
+  for(auto const& filePath : filePathList)
+    QFile::remove(filePath);
+}
+
 QStringList FileOperationHandler::getImagesPathList(const QString &path)
 {
   auto nameList = QDir(path).entryList(

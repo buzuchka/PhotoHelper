@@ -26,6 +26,7 @@ public:
                             const QString &destinationFileName = QString());
 
   Q_INVOKABLE void deleteFile(const QString &filePath);
+  Q_INVOKABLE void deleteFiles(const QStringList &filePathList);
 
   Q_INVOKABLE QStringList getImagesPathList(const QString &path);
 };

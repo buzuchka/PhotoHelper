@@ -31,8 +31,14 @@ public:
   //! Удаление элемента
   Q_INVOKABLE void deleteItem(int index);
 
+  //! Удаление нескольких элементов
+  Q_INVOKABLE void deleteItems(QList<int> const& indexes);
+
   //! Возвращает путь по индексу
   Q_INVOKABLE QString getFilePath(int index);
+
+  //! Возвращает список путей по индексам
+  Q_INVOKABLE QStringList getFilePathList(QList<int> const& indexes);
 
   //! Возвращает имя файла по индексу
   Q_INVOKABLE QString getFileName(int index);

@@ -141,7 +141,7 @@ Window {
 
           text: "All"
           enabled: !loader.source.toString().includes("AllPhotoItem.qml")
-          onClicked: loader.setSource("AllPhotoItem.qml", {"model": photoModel})
+          onClicked: loader.setSource("AllPhotoItem.qml", {"photoModel": photoModel})
         }
       }
 
@@ -169,10 +169,11 @@ Window {
           shortcut: StandardKey.Delete
         }
         onClicked: {
-          resetRotation()
-          cppFileOperationHandler.deleteFile(photoModel.getFilePath(currentIndex))
-          photoModel.deleteItem(currentIndex)
-          updatePhotoByIndex()
+          loader.item.deletePhoto()
+          //resetRotation()
+          //cppFileOperationHandler.deleteFile(photoModel.getFilePath(currentIndex))
+          //photoModel.deleteItem(currentIndex)
+          //updatePhotoByIndex()
         }
       }
 

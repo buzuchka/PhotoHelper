@@ -3,6 +3,8 @@
 #include <QDir>
 #include <QFileInfo>
 
+#include <QDebug>
+
 namespace PhotoHelper {
 
 PhotoModel::PhotoModel(QObject *parent)
@@ -48,13 +50,9 @@ QHash<int, QByteArray> PhotoModel::roleNames() const
 
 void PhotoModel::setData(const QStringList &pathList)
 {
-  beginInsertRows(QModelIndex(), m_data.size(), m_data.size());
-  auto data = pathList;
+  beginResetModel();
   m_data = pathList;
-  endInsertRows();
-
-  QModelIndex index = createIndex(0, 0, static_cast<void *>(0));
-  emit dataChanged(index, index);
+  endResetModel();
 }
 
 void PhotoModel::setSelectedIndexes(const QList<int> &indexes)
@@ -64,10 +62,23 @@ void PhotoModel::setSelectedIndexes(const QList<int> &indexes)
 
 void PhotoModel::deleteItem(int index)
 {
-  m_data.removeAt(index);
+  //m_data.removeAt(index);
 
-  QModelIndex ind = createIndex(index, 0, static_cast<void *>(0));
-  emit dataChanged(ind, ind);
+  //QModelIndex ind = createIndex(index, 0, static_cast<void *>(0));
+  //emit dataChanged(ind, ind);
+}
+
+void PhotoModel::deleteItems(const QList<int> &indexes)
+{
+  QList<int> sortedList = indexes;
+  std::sort(sortedList.begin(), sortedList.end());
+
+  for(int i = sortedList.count() - 1; i >= 0; --i)
+  {
+    beginRemoveRows(QModelIndex(), sortedList.at(i), sortedList.at(i));
+    m_data.removeAt(sortedList.at(i));
+    endRemoveRows();
+  }
 }
 
 QString PhotoModel::getFilePath(int index)
@@ -78,9 +89,17 @@ QString PhotoModel::getFilePath(int index)
   return m_data.at(index);
 }
 
+QStringList PhotoModel::getFilePathList(const QList<int> &indexes)
+{
+  QStringList list;
+  for(int i = 0; i < indexes.count(); ++i)
+    list.append(m_data.at(indexes.at(i)));
+  return list;
+}
+
 QString PhotoModel::getFileName(int index)
 {
-  if(index < 0)
+  if(index < 0 || (m_data.count() == 0))
     return QString();
 
   QFileInfo fileInfo(m_data.at(index));
