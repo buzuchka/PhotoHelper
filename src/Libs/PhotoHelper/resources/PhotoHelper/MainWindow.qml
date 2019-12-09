@@ -17,8 +17,6 @@ Window {
   property int buttonWidth: 200
   property int buttonMargin: 50
 
-  property int currentIndex: -1
-
   function isCurrentOnePhotoItem() {
     return loader.source.toString().includes("OnePhotoItem.qml")
   }
@@ -92,7 +90,9 @@ Window {
           enabled: isCurrentAllPhotoItem()
           onClicked: loader.setSource("OnePhotoItem.qml",
                                       {"photoModel": photoModel,
-                                       "fileOperationHandler": fileOperationHandler})
+                                       "fileOperationHandler": fileOperationHandler,
+                                       "outsideIndex": loader.item.selectedIndexes[0]
+                                      })
         }
 
         Button {
@@ -102,7 +102,9 @@ Window {
           enabled:isCurrentOnePhotoItem()
           onClicked: loader.setSource("AllPhotoItem.qml",
                                       {"photoModel": photoModel,
-                                       "fileOperationHandler": fileOperationHandler})
+                                       "fileOperationHandler": fileOperationHandler,
+                                       "outsideIndex": loader.item.mainCurrentIndex
+                                      })
         }
       }
 
@@ -146,35 +148,7 @@ Window {
         model: DestinationFolderModel {
           id: destinationModel
         }
-      }
-
-      Button {
-        id: forwardButton
-
-        Layout.fillWidth: true
-
-        text: qsTr("Вперед")
-        enabled: currentIndex < photoListView.count-1
-        action: Action {
-          text: qsTr("Вперед")
-          shortcut: StandardKey.MoveToNextChar
-        }
-        onClicked: currentIndex++
-      }
-
-      Button {
-        id: backButton
-
-        Layout.fillWidth: true
-
-        text: qsTr("Назад")
-        enabled: currentIndex > 0
-        action: Action {
-          text: qsTr("Назад")
-          shortcut: StandardKey.MoveToPreviousChar
-        }
-        onClicked: currentIndex--
-      }
+      }      
     }
   }
   Component.onCompleted: {
@@ -185,7 +159,6 @@ Window {
       loader.setSource("OnePhotoItem.qml",
                        {"photoModel": photoModel,
                         "fileOperationHandler": fileOperationHandler})
-      currentIndex = 0
     }
   }
 }

@@ -14,6 +14,8 @@ Item {
   property int previousIndex: -1
   property int updateCounter: 0 // for force re-evaliation of values in delegates
 
+  property int outsideIndex: -1
+
   ListView {
     id: photoListView
     model: photoModel
@@ -34,7 +36,6 @@ Item {
       fileOperationHandler.deleteFiles(
             photoModel.getFilePathList(selectedIndexes))
       photoModel.deleteItems(selectedIndexes)
-      console.log(selectedIndexes)
       selectedIndexes = []
       photoModel.setSelectedIndexes(selectedIndexes)
       updateCounter++
@@ -71,6 +72,7 @@ Item {
 
       clip: true
       focus: true
+      cacheBuffer: 20
 
       model: photoModel
 
@@ -149,6 +151,17 @@ Item {
 
           text: photoListView.count + " " + qsTr("фото")
       }
+    }
+  }
+
+  Component.onCompleted: {
+    view.forceActiveFocus()
+
+    if(outsideIndex > 0) {
+      selectedIndexes = [outsideIndex]
+      view.positionViewAtIndex(outsideIndex, GridView.Beginning)
+      photoModel.setSelectedIndexes(selectedIndexes)
+      updateCounter++
     }
   }
 }

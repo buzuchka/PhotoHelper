@@ -7,45 +7,68 @@ Item {
   property var photoModel
   property var fileOperationHandler
 
+  property int mainCurrentIndex: 0
+
+  property int outsideIndex: -1
+
   function copyPhoto(path) {
-      fileOperationHandler.copyFile(
-            photoModel.getFilePath(currentIndex),
-            path)
+    fileOperationHandler.copyFile(
+          photoModel.getFilePath(mainCurrentIndex),
+          path)
   }
 
   function deletePhoto() {
-      fileOperationHandler.deleteFile(photoModel.getFilePath(currentIndex))
-      photoModel.deleteItem(currentIndex)
-  }
-
-  ListView {
-    id: photoListView
-    model: photoModel
-    delegate: Text {}
-    visible: false
+    fileOperationHandler.deleteFile(photoModel.getFilePath(mainCurrentIndex))
+    photoModel.deleteItem(mainCurrentIndex)
   }
 
   ColumnLayout {
     anchors.fill: parent
 
-    Item {
-      id: photoWrapper
+    ListView {
+      id: photoListView
 
       Layout.fillWidth: true
       Layout.fillHeight: true
 
       clip: true
+      interactive: false
+      orientation: ListView.Horizontal
 
-      Image {
-        id: photo
+      model: photoModel
 
-        anchors.fill: parent
+      delegate: Item {
+        id: photoWrapper
 
-        cache: false
-        fillMode: Image.PreserveAspectFit
-        source: "file:" + photoModel.getFilePath(currentIndex)
+        width: ListView.view.width === 0 ? 600 : ListView.view.width
+        height: ListView.view.height
 
-        rotation: 0
+        clip: true
+
+        Image {
+          id: photo
+
+          anchors.fill: parent
+
+          cache: false
+          fillMode: Image.PreserveAspectFit
+          source: "file:" + model.path
+
+          rotation: 0
+        }
+      }
+
+      Keys.onLeftPressed: {
+        if(photoListView.count > 0 && mainCurrentIndex >= 1) {
+          mainCurrentIndex--
+          photoListView.positionViewAtIndex(mainCurrentIndex, ListView.Beginning)
+        }
+      }
+      Keys.onRightPressed: {
+        if(mainCurrentIndex < photoListView.count - 1) {
+          mainCurrentIndex++
+          photoListView.positionViewAtIndex(mainCurrentIndex, ListView.Beginning)
+        }
       }
     }
 
@@ -63,8 +86,8 @@ Item {
           anchors.fill: parent
           verticalAlignment: Text.AlignVCenter
 
-          visible: currentIndex >= 0 ? true : false
-          text: (currentIndex + 1) + " / " + photoListView.count
+          visible: mainCurrentIndex >= 0 ? true : false
+          text: (mainCurrentIndex + 1) + " / " + photoListView.count
         }
       }
 
@@ -77,10 +100,18 @@ Item {
           verticalAlignment: Text.AlignVCenter
           horizontalAlignment: Text.AlignRight
 
-          visible: currentIndex >= 0
-          text: photoModel.getFileName(currentIndex)
+          visible: mainCurrentIndex >= 0
+          text: photoModel.getFileName(mainCurrentIndex)
         }
       }
+    }
+  }
+  Component.onCompleted: {
+    photoListView.forceActiveFocus()
+
+    if(outsideIndex > 0) {
+      mainCurrentIndex = outsideIndex
+      photoListView.positionViewAtIndex(mainCurrentIndex, ListView.Beginning)
     }
   }
 }
