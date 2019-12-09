@@ -65,6 +65,10 @@ void PhotoModel::deleteItem(int index)
   beginRemoveRows(QModelIndex(), index, index);
   m_data.removeAt(index);
   endRemoveRows();
+
+  // Для мгновенного обновления в окне просмотра одного фото
+  QModelIndex ind = createIndex(index, index, nullptr);
+  emit dataChanged(ind, ind);
 }
 
 void PhotoModel::deleteItems(const QList<int> &indexes)
@@ -73,11 +77,7 @@ void PhotoModel::deleteItems(const QList<int> &indexes)
   std::sort(sortedList.begin(), sortedList.end());
 
   for(int i = sortedList.count() - 1; i >= 0; --i)
-  {
-    beginRemoveRows(QModelIndex(), sortedList.at(i), sortedList.at(i));
-    m_data.removeAt(sortedList.at(i));
-    endRemoveRows();
-  }
+    deleteItem(sortedList.at(i));
 }
 
 QString PhotoModel::getFilePath(int index)
