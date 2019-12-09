@@ -136,6 +136,27 @@ Item {
           }
         }
       }
+
+      MouseArea {
+        property var factor
+
+        anchors.fill: parent
+        propagateComposedEvents: true
+        onWheel: {
+          if (wheel.modifiers & Qt.ControlModifier) {
+            if (wheel.angleDelta.y > 0)
+                factor = 2.0;
+            else
+                factor = 0.5;
+
+            if(view.cellWidth * factor >= photoSize &&
+               view.cellWidth * factor < view.height)
+              view.cellWidth = view.cellWidth * factor
+          }
+          else
+            wheel.accepted = false
+        }
+      }
     }
 
     RowLayout {
