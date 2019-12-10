@@ -1,0 +1,9 @@
+<RCC>
+    <qresource prefix="/">
+        <file>PhotoHelper/InitialDialog.qml</file>
+        <file>PhotoHelper/qmldir</file>
+        <file>PhotoHelper/AllPhotoItem.qml</file>
+        <file>PhotoHelper/MainWindow.qml</file>
+        <file>PhotoHelper/OnePhotoItem.qml</file>
+    </qresource>
+</RCC>
