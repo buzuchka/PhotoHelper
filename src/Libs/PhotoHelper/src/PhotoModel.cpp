@@ -55,20 +55,11 @@ void PhotoModel::setData(const QStringList &pathList)
   endResetModel();
 }
 
-void PhotoModel::setSelectedIndexes(const QList<int> &indexes)
-{
-  m_selectedIndexes = indexes;
-}
-
 void PhotoModel::deleteItem(int index)
 {
   beginRemoveRows(QModelIndex(), index, index);
   m_data.removeAt(index);
   endRemoveRows();
-
-  // Для мгновенного обновления в окне просмотра одного фото
-  QModelIndex ind = createIndex(index, index, nullptr);
-  emit dataChanged(ind, ind);
 }
 
 void PhotoModel::deleteItems(const QList<int> &indexes)
@@ -103,6 +94,17 @@ QString PhotoModel::getFileName(int index)
 
   QFileInfo fileInfo(m_data.at(index));
   return fileInfo.fileName();
+}
+
+QList<int> PhotoModel::selectedIndexes() const
+{
+  return m_selectedIndexes;
+}
+
+void PhotoModel::setSelectedIndexes(const QList<int> &indexes)
+{
+  m_selectedIndexes = indexes;
+  emit selectedIndexesChanged();
 }
 
 } // !PhotoHelper

@@ -11,6 +11,10 @@ namespace PhotoHelper {
 class PHOTOHELPER_EXPORT PhotoModel : public QAbstractListModel
 {
   Q_OBJECT
+  Q_PROPERTY(QList<int> selectedIndexes
+             READ selectedIndexes
+             WRITE setSelectedIndexes
+             NOTIFY selectedIndexesChanged)
 public:
   enum Roles {
       NameRole = Qt::UserRole + 1,
@@ -26,8 +30,6 @@ public:
 
   Q_INVOKABLE void setData(const QStringList &data);
 
-  Q_INVOKABLE void setSelectedIndexes(QList<int> const& indexes);
-
   //! Удаление элемента
   Q_INVOKABLE void deleteItem(int index);
 
@@ -42,6 +44,12 @@ public:
 
   //! Возвращает имя файла по индексу
   Q_INVOKABLE QString getFileName(int index);
+
+  Q_INVOKABLE QList<int> selectedIndexes() const;
+  Q_INVOKABLE void setSelectedIndexes(const QList<int> &list);
+
+signals:
+  void selectedIndexesChanged();
 
 private:
   QStringList m_data;

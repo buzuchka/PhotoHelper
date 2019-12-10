@@ -15,11 +15,20 @@ Item {
     fileOperationHandler.copyFile(
           photoModel.getFilePath(mainCurrentIndex),
           path)
+    photoListView.forceActiveFocus()
   }
 
   function deletePhoto() {
     fileOperationHandler.deleteFile(photoModel.getFilePath(mainCurrentIndex))
     photoModel.deleteItem(mainCurrentIndex)
+    photoListView.forceActiveFocus()
+    if(mainCurrentIndex == elementsCount - 1)
+      mainCurrentIndex--
+    updateCurrentNameLabel()
+  }
+
+  function updateCurrentNameLabel() {
+    photoNameLabel.text = photoModel.getFileName(mainCurrentIndex)
   }
 
   ColumnLayout {
@@ -59,15 +68,17 @@ Item {
       }
 
       Keys.onLeftPressed: {
-        if(photoListView.count > 0 && mainCurrentIndex >= 1) {
+        if(elementsCount > 0 && mainCurrentIndex >= 1) {
           mainCurrentIndex--
           photoListView.positionViewAtIndex(mainCurrentIndex, ListView.Beginning)
+          updateCurrentNameLabel()
         }
       }
       Keys.onRightPressed: {
-        if(mainCurrentIndex < photoListView.count - 1) {
+        if(mainCurrentIndex < elementsCount - 1) {
           mainCurrentIndex++
           photoListView.positionViewAtIndex(mainCurrentIndex, ListView.Beginning)
+          updateCurrentNameLabel()
         }
       }
     }
@@ -76,7 +87,7 @@ Item {
       Layout.fillWidth: true
       Layout.fillHeight: true
 
-      Layout.maximumHeight: 50
+      Layout.maximumHeight: 30
 
       Item {
         Layout.fillWidth: true
@@ -87,7 +98,7 @@ Item {
           verticalAlignment: Text.AlignVCenter
 
           visible: mainCurrentIndex >= 0 ? true : false
-          text: (mainCurrentIndex + 1) + " / " + photoListView.count
+          text: (mainCurrentIndex + 1) + " / " + elementsCount + " " + qsTr("фото")
         }
       }
 
@@ -96,12 +107,13 @@ Item {
         Layout.fillHeight: true
 
         Text {
+          id: photoNameLabel
+
           anchors.fill: parent
           verticalAlignment: Text.AlignVCenter
           horizontalAlignment: Text.AlignRight
 
-          visible: mainCurrentIndex >= 0
-          text: photoModel.getFileName(mainCurrentIndex)
+          visible: elementsCount > 0 && mainCurrentIndex >= 0
         }
       }
     }
@@ -113,5 +125,6 @@ Item {
       mainCurrentIndex = outsideIndex
       photoListView.positionViewAtIndex(mainCurrentIndex, ListView.Beginning)
     }
+    updateCurrentNameLabel()
   }
 }

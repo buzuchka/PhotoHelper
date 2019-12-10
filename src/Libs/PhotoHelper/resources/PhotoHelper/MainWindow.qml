@@ -17,6 +17,8 @@ Window {
   property int buttonWidth: 200
   property int buttonMargin: 50
 
+  property int elementsCount:  photoListView.count
+
   function isCurrentOnePhotoItem() {
     return loader.source.toString().includes("OnePhotoItem.qml")
   }
@@ -32,6 +34,7 @@ Window {
     id: photoModel
   }
 
+  // Только для получения актуального количества элементов в модели
   ListView {
     id: photoListView
     model: photoModel
@@ -52,7 +55,7 @@ Window {
         Layout.fillHeight: true
         Layout.alignment: Qt.AlignCenter
 
-        visible: photoListView.count == 0
+        visible: elementsCount == 0
         text: qsTr("Нет изображений")
         color: "gray"
         font.pointSize: 20
@@ -67,7 +70,7 @@ Window {
         Layout.fillWidth: true
         Layout.fillHeight: true
 
-        visible: photoListView.count != 0
+        visible: elementsCount != 0
       }      
     }
 
@@ -91,7 +94,7 @@ Window {
           onClicked: loader.setSource("OnePhotoItem.qml",
                                       {"photoModel": photoModel,
                                        "fileOperationHandler": fileOperationHandler,
-                                       "outsideIndex": loader.item.selectedIndexes[0]
+                                       "outsideIndex": loader.item.mainCurrentIndex
                                       })
         }
 
@@ -122,7 +125,7 @@ Window {
         Layout.fillWidth: true
 
         text: qsTr("Удалить")
-        enabled: photoListView.count > 0
+        enabled: elementsCount > 0
         action: Action {
           text: qsTr("Удалить")
           shortcut: StandardKey.Delete
@@ -155,7 +158,7 @@ Window {
     photoModel.setData(fileOperationHandler.getImagesPathList(folderSet.sourcePath))
     destinationModel.init()
 
-    if (photoListView.count > 0) {
+    if (elementsCount > 0) {
       loader.setSource("OnePhotoItem.qml",
                        {"photoModel": photoModel,
                         "fileOperationHandler": fileOperationHandler})
