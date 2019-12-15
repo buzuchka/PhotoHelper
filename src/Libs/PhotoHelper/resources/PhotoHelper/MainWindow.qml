@@ -113,10 +113,9 @@ Window {
 
       Button {
         id: rotateButton
-
         Layout.fillWidth: true
-
         text: qsTr("Повернуть")
+        onClicked: loader.item.rotatePhoto()
       }
 
       Button {
@@ -155,7 +154,8 @@ Window {
     }
   }
   Component.onCompleted: {
-    photoModel.setData(fileOperationHandler.getImagesPathList(folderSet.sourcePath))
+    photoModel.setData(fileOperationHandler.getImagesPathList(folderSet.sourcePath),
+                       fileOperationHandler.getImagesOrientationList(folderSet.sourcePath))
     destinationModel.init()
 
     if (elementsCount > 0) {

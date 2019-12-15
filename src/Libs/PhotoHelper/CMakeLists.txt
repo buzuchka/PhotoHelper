@@ -21,7 +21,9 @@ target_include_directories(${PROJECT_NAME}
 PUBLIC
   "${CMAKE_CURRENT_SOURCE_DIR}/include"
   ${CMAKE_CURRENT_BINARY_DIR}
+  ${EXPAT_INCLUDE_DIRS}
 PRIVATE
+  ${CMAKE_BINARY_DIR}
   "${CMAKE_CURRENT_SOURCE_DIR}/include/PhotoHelper"
   "${CMAKE_CURRENT_SOURCE_DIR}/src"
 )
@@ -29,6 +31,9 @@ PRIVATE
 target_link_libraries(${PROJECT_NAME}
 PRIVATE
   ${QTLIBRARIES}
+  ${ZLIB_LIBRARIES}
+  ${EXPAT_LIBRARIES}
+  exiv2lib
 )
 
 set_target_properties(${PROJECT_NAME} PROPERTIES

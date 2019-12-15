@@ -15,11 +15,15 @@ class PHOTOHELPER_EXPORT PhotoModel : public QAbstractListModel
              READ selectedIndexes
              WRITE setSelectedIndexes
              NOTIFY selectedIndexesChanged)
+  Q_PROPERTY(QStringList orientationList
+             READ orientationList
+             NOTIFY orientationListChanged)
 public:
   enum Roles {
-      NameRole = Qt::UserRole + 1,
-      PathRole,
-      SelectedRole
+    NameRole = Qt::UserRole + 1,
+    PathRole,
+    SelectedRole,
+    OrientationRole
   };
 
   PhotoModel(QObject *parent = nullptr);
@@ -28,7 +32,8 @@ public:
   QVariant data(const QModelIndex &index, int role) const override;
   QHash<int, QByteArray> roleNames() const override;
 
-  Q_INVOKABLE void setData(const QStringList &data);
+  Q_INVOKABLE void setData(const QStringList &pathList,
+                           const QStringList &orientationList);
 
   //! Удаление элемента
   Q_INVOKABLE void deleteItem(int index);
@@ -48,11 +53,18 @@ public:
   Q_INVOKABLE QList<int> selectedIndexes() const;
   Q_INVOKABLE void setSelectedIndexes(const QList<int> &list);
 
+  Q_INVOKABLE QStringList orientationList() const;
+
+  Q_INVOKABLE void setOrientation(int index, int orientation);
+  Q_INVOKABLE int getOrientation(int index);
+
 signals:
   void selectedIndexesChanged();
+  void orientationListChanged();
 
 private:
-  QStringList m_data;
+  QStringList m_pathList;
+  QStringList m_orientationList;
   QList<int> m_selectedIndexes;
 };
 

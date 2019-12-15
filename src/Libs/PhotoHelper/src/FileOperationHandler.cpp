@@ -3,6 +3,8 @@
 #include <QDateTime>
 #include <QDir>
 
+#include <exiv2/exiv2.hpp>
+
 namespace PhotoHelper {
 
 FileOperationHandler::FileOperationHandler()
@@ -91,6 +93,76 @@ QStringList FileOperationHandler::getImagesPathList(const QString &path)
     name.prepend(path + QDir::separator());
 
   return nameList;
+}
+
+QStringList FileOperationHandler::getImagesOrientationList(const QString &path)
+{
+  QStringList orientationList;
+
+  auto pathList = getImagesPathList(path);
+  for(auto &filePath : pathList)
+  {
+    Exiv2::Image::AutoPtr image = Exiv2::ImageFactory::open(filePath.toStdString());
+    assert (image.get() != 0);
+    image->readMetadata();
+    Exiv2::ExifData& ed = image->exifData();
+    if (ed.empty())
+      std::string error = filePath.toStdString() + ": No Exif data found in the file";
+
+    // Ориентация изображения (в какую сторону требуется повернуть)
+    enum Orientation
+    {
+      Normal = 0, // exif = 1
+      Left,       // exif = 8
+      UpsideDown, // exif = 3
+      Right       // exif = 6
+    };
+
+    auto orientationExif = ed["Exif.Image.Orientation"].toLong();
+    Orientation orientation = Normal;
+    if(orientationExif == 8)
+      orientation = Right;
+    else if(orientationExif == 3)
+      orientation = UpsideDown;
+    else if(orientationExif == 6)
+      orientation = Left;
+
+    orientationList.push_back(QString::number(orientation));
+  }
+  return orientationList;
+}
+
+void FileOperationHandler::setImageOrientation(const QString &filePath,
+                                               int orientation)
+{
+  Exiv2::Image::AutoPtr image = Exiv2::ImageFactory::open(filePath.toStdString());
+  assert (image.get() != 0);
+  image->readMetadata();
+  Exiv2::ExifData& ed = image->exifData();
+  if (ed.empty())
+    std::string error = filePath.toStdString() + ": No Exif data found in the file";
+
+  // Ориентация изображения (в какую сторону требуется повернуть)
+  enum Orientation
+  {
+    Normal = 0, // exif = 1
+    Left,       // exif = 8
+    UpsideDown, // exif = 3
+    Right       // exif = 6
+  };
+
+  int orientationExif = 1;
+
+  if(orientation == 1)
+    orientationExif = 8;
+  else if(orientation == 2)
+    orientationExif = 3;
+  else if(orientation == 3)
+    orientationExif = 6;
+
+  ed["Exif.Image.Orientation"] = uint16_t(orientationExif);
+  image->setExifData(ed);
+  image->writeMetadata();
 }
 
 } // !PhotoHelper

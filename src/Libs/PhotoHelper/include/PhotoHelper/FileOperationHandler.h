@@ -32,6 +32,10 @@ public:
   Q_INVOKABLE void deleteFiles(const QStringList &filePathList);
 
   Q_INVOKABLE QStringList getImagesPathList(const QString &path);
+  Q_INVOKABLE QStringList getImagesOrientationList(const QString &path);
+
+  Q_INVOKABLE void setImageOrientation(const QString &filePath,
+                                       int orientation);
 };
 
 } // !PhotoHelper

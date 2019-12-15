@@ -27,6 +27,19 @@ Item {
     updateCurrentNameLabel()
   }
 
+  function rotatePhoto() {
+    var oldOrientation = photoModel.getOrientation(mainCurrentIndex)
+    var newOrientation = 0;
+
+    if(oldOrientation < 3)
+      newOrientation = oldOrientation + 1;
+
+    photoModel.setOrientation(mainCurrentIndex, newOrientation)
+    fileOperationHandler.setImageOrientation(photoModel.getFilePath(mainCurrentIndex),
+                                             newOrientation)
+    photoListView.forceActiveFocus()
+  }
+
   function updateCurrentNameLabel() {
     photoNameLabel.text = photoModel.getFileName(mainCurrentIndex)
   }
@@ -57,13 +70,18 @@ Item {
         Image {
           id: photo
 
-          anchors.fill: parent
+          anchors.centerIn: parent
+
+          width: (model.orientation === 0) || (model.orientation === 2) ?
+                   parent.width : parent.height
+          height: (model.orientation === 0) || (model.orientation === 2) ?
+                   parent.height : parent.width
 
           cache: false
           fillMode: Image.PreserveAspectFit
           source: "file:" + model.path
 
-          rotation: 0
+          rotation: 90 * model.orientation
         }
       }
 

@@ -17,7 +17,7 @@ int PhotoModel::rowCount(const QModelIndex &parent) const
   if (parent.isValid())
     return 0;
 
-  return m_data.size();
+  return m_pathList.size();
 }
 
 QVariant PhotoModel::data(const QModelIndex &index, int role) const
@@ -28,11 +28,13 @@ QVariant PhotoModel::data(const QModelIndex &index, int role) const
 
   switch (role) {
   case NameRole:
-      return QFileInfo(m_data.at(index.row())).fileName();
+      return QFileInfo(m_pathList.at(index.row())).fileName();
   case PathRole:
-      return m_data.at(index.row());
+      return m_pathList.at(index.row());
   case SelectedRole:
     return m_selectedIndexes.contains(index.row());
+  case OrientationRole:
+    return m_orientationList.at(index.row()).toInt();
   default:
       return QVariant();
   }
@@ -44,21 +46,24 @@ QHash<int, QByteArray> PhotoModel::roleNames() const
   roles[NameRole] = "name";
   roles[PathRole] = "path";
   roles[SelectedRole] = "selected";
+  roles[OrientationRole] = "orientation";
 
   return roles;
 }
 
-void PhotoModel::setData(const QStringList &pathList)
+void PhotoModel::setData(const QStringList &pathList,
+                         const QStringList &orientationList)
 {
   beginResetModel();
-  m_data = pathList;
+  m_pathList = pathList;
+  m_orientationList = orientationList;
   endResetModel();
 }
 
 void PhotoModel::deleteItem(int index)
 {
   beginRemoveRows(QModelIndex(), index, index);
-  m_data.removeAt(index);
+  m_pathList.removeAt(index);
   endRemoveRows();
 }
 
@@ -76,23 +81,23 @@ QString PhotoModel::getFilePath(int index)
   if(index < 0)
     return QString();
 
-  return m_data.at(index);
+  return m_pathList.at(index);
 }
 
 QStringList PhotoModel::getFilePathList(const QList<int> &indexes)
 {
   QStringList list;
   for(int i = 0; i < indexes.count(); ++i)
-    list.append(m_data.at(indexes.at(i)));
+    list.append(m_pathList.at(indexes.at(i)));
   return list;
 }
 
 QString PhotoModel::getFileName(int index)
 {
-  if(index < 0 || (m_data.count() == 0))
+  if(index < 0 || (m_pathList.count() == 0))
     return QString();
 
-  QFileInfo fileInfo(m_data.at(index));
+  QFileInfo fileInfo(m_pathList.at(index));
   return fileInfo.fileName();
 }
 
@@ -105,6 +110,24 @@ void PhotoModel::setSelectedIndexes(const QList<int> &indexes)
 {
   m_selectedIndexes = indexes;
   emit selectedIndexesChanged();
+}
+
+QStringList PhotoModel::orientationList() const
+{
+  return m_orientationList;
+}
+
+void PhotoModel::setOrientation(int index, int orientation)
+{
+  m_orientationList[index] = QString::number(orientation);
+  QModelIndex ind = createIndex(index, index);
+  emit dataChanged(ind, ind);
+  emit orientationListChanged();
+}
+
+int PhotoModel::getOrientation(int index)
+{
+  return m_orientationList.at(index).toInt();
 }
 
 } // !PhotoHelper
