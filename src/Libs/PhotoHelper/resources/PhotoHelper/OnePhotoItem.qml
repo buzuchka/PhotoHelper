@@ -27,16 +27,9 @@ Item {
     updateCurrentNameLabel()
   }
 
-  function rotatePhoto() {
-    var oldOrientation = photoModel.getOrientation(mainCurrentIndex)
-    var newOrientation = 0;
-
-    if(oldOrientation < 3)
-      newOrientation = oldOrientation + 1;
-
-    photoModel.setOrientation(mainCurrentIndex, newOrientation)
-    fileOperationHandler.setImageOrientation(photoModel.getFilePath(mainCurrentIndex),
-                                             newOrientation)
+  function rotateRightPhoto() {
+    photoModel.rotateRight(mainCurrentIndex)
+    fileOperationHandler.rotateRightImage(photoModel.getFilePath(mainCurrentIndex))
     photoListView.forceActiveFocus()
   }
 

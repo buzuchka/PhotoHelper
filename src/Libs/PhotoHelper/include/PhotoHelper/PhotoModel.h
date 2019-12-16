@@ -55,8 +55,10 @@ public:
 
   Q_INVOKABLE QStringList orientationList() const;
 
-  Q_INVOKABLE void setOrientation(int index, int orientation);
   Q_INVOKABLE int getOrientation(int index);
+
+  Q_INVOKABLE void rotateRight(int index);
+  Q_INVOKABLE void rotateRightSelectedIndexes();
 
 signals:
   void selectedIndexesChanged();

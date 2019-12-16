@@ -10,6 +10,14 @@
 
 namespace PhotoHelper {
 
+enum RightOrientation
+{
+  Normal = 0, // exif = 1
+  Right,      // exif = 6
+  UpsideDown, // exif = 3
+  Left        // exif = 8
+};
+
 class PHOTOHELPER_EXPORT FileOperationHandler : public QObject
 {
   Q_OBJECT
@@ -34,8 +42,11 @@ public:
   Q_INVOKABLE QStringList getImagesPathList(const QString &path);
   Q_INVOKABLE QStringList getImagesOrientationList(const QString &path);
 
-  Q_INVOKABLE void setImageOrientation(const QString &filePath,
-                                       int orientation);
+  // Поворот изображения вправо
+   Q_INVOKABLE void rotateRightImage(const QString &filePath);
+
+  // Поворот нескольких изображений вправо
+  Q_INVOKABLE void rotateRightImages(const QStringList &filePathList);
 };
 
 } // !PhotoHelper

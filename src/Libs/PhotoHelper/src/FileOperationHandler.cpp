@@ -5,8 +5,35 @@
 
 #include <exiv2/exiv2.hpp>
 
+#include <unordered_map>
+
 namespace PhotoHelper {
 
+std::unordered_map<int, RightOrientation> exifOrientationMap = {
+  {1, RightOrientation::Normal},
+  {6, RightOrientation::Right},
+  {3, RightOrientation::UpsideDown},
+  {8, RightOrientation::Left}
+};
+
+RightOrientation orientationByExifNumber(int exifNumber)
+{
+  return exifOrientationMap.at(exifNumber);
+}
+
+std::unordered_map<RightOrientation, int> orientationExifMap = {
+  {RightOrientation::Normal,     1},
+  {RightOrientation::Right,      6},
+  {RightOrientation::UpsideDown, 3},
+  {RightOrientation::Left,       8}
+};
+
+int exifNumberByOrientation(RightOrientation o)
+{
+  return orientationExifMap.at(o);
+}
+
+//==============================================================================
 FileOperationHandler::FileOperationHandler()
 {
 }
@@ -109,60 +136,44 @@ QStringList FileOperationHandler::getImagesOrientationList(const QString &path)
     if (ed.empty())
       std::string error = filePath.toStdString() + ": No Exif data found in the file";
 
-    // Ориентация изображения (в какую сторону требуется повернуть)
-    enum Orientation
-    {
-      Normal = 0, // exif = 1
-      Left,       // exif = 8
-      UpsideDown, // exif = 3
-      Right       // exif = 6
-    };
-
     auto orientationExif = ed["Exif.Image.Orientation"].toLong();
-    Orientation orientation = Normal;
-    if(orientationExif == 8)
-      orientation = Right;
-    else if(orientationExif == 3)
-      orientation = UpsideDown;
-    else if(orientationExif == 6)
-      orientation = Left;
-
+    RightOrientation orientation = orientationByExifNumber(orientationExif);
     orientationList.push_back(QString::number(orientation));
   }
   return orientationList;
 }
 
-void FileOperationHandler::setImageOrientation(const QString &filePath,
-                                               int orientation)
+// Поворот изображения вправо
+void FileOperationHandler::rotateRightImage(const QString &filePath)
 {
-  Exiv2::Image::AutoPtr image = Exiv2::ImageFactory::open(filePath.toStdString());
-  assert (image.get() != 0);
+  Exiv2::Image::AutoPtr image = Exiv2::ImageFactory::open(filePath.toStdWString());
+  assert (image.get() != nullptr);
   image->readMetadata();
   Exiv2::ExifData& ed = image->exifData();
   if (ed.empty())
     std::string error = filePath.toStdString() + ": No Exif data found in the file";
 
-  // Ориентация изображения (в какую сторону требуется повернуть)
-  enum Orientation
-  {
-    Normal = 0, // exif = 1
-    Left,       // exif = 8
-    UpsideDown, // exif = 3
-    Right       // exif = 6
-  };
+  QString exifOrientationTag("Exif.Image.Orientation");
 
-  int orientationExif = 1;
+  auto oldOrientationExif = ed[exifOrientationTag.toStdString().c_str()].toLong();
+  auto oldOrientation = orientationByExifNumber(oldOrientationExif);
 
-  if(orientation == 1)
-    orientationExif = 8;
-  else if(orientation == 2)
-    orientationExif = 3;
-  else if(orientation == 3)
-    orientationExif = 6;
+  auto newOrientation = RightOrientation::Normal;
 
-  ed["Exif.Image.Orientation"] = uint16_t(orientationExif);
+  if(oldOrientation < RightOrientation::Left)
+    newOrientation = static_cast<RightOrientation>(oldOrientation + 1);
+
+  auto newOrientationExif = exifNumberByOrientation(newOrientation);
+
+  ed[exifOrientationTag.toStdString().c_str()] = uint16_t(newOrientationExif);
   image->setExifData(ed);
   image->writeMetadata();
+}
+
+void FileOperationHandler::rotateRightImages(const QStringList &pathList)
+{
+  for(auto & path : pathList)
+    rotateRightImage(path);
 }
 
 } // !PhotoHelper

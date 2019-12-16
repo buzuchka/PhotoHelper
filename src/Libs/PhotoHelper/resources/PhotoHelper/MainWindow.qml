@@ -115,7 +115,7 @@ Window {
         id: rotateButton
         Layout.fillWidth: true
         text: qsTr("Повернуть")
-        onClicked: loader.item.rotatePhoto()
+        onClicked: loader.item.rotateRightPhoto()
       }
 
       Button {

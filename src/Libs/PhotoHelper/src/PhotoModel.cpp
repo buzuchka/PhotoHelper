@@ -117,17 +117,31 @@ QStringList PhotoModel::orientationList() const
   return m_orientationList;
 }
 
-void PhotoModel::setOrientation(int index, int orientation)
-{
-  m_orientationList[index] = QString::number(orientation);
-  QModelIndex ind = createIndex(index, index);
-  emit dataChanged(ind, ind);
-  emit orientationListChanged();
-}
-
 int PhotoModel::getOrientation(int index)
 {
   return m_orientationList.at(index).toInt();
+}
+
+void PhotoModel::rotateRight(int index)
+{
+  int oldOrientation = m_orientationList.at(index).toInt();
+  int newOrientation = 0;
+
+  if(oldOrientation < 3)
+    newOrientation = oldOrientation + 1;
+
+  m_orientationList[index] = QString::number(newOrientation);
+
+  QModelIndex ind = createIndex(index, index);
+  emit dataChanged(ind, ind);
+
+  emit orientationListChanged();
+}
+
+void PhotoModel::rotateRightSelectedIndexes()
+{
+  for(int ind : m_selectedIndexes)
+    rotateRight(ind);
 }
 
 } // !PhotoHelper
