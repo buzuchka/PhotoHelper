@@ -129,7 +129,7 @@ QStringList FileOperationHandler::getImagesOrientationList(const QString &path)
   auto pathList = getImagesPathList(path);
   for(auto &filePath : pathList)
   {
-    Exiv2::Image::AutoPtr image = Exiv2::ImageFactory::open(filePath.toStdString());
+    Exiv2::Image::AutoPtr image = Exiv2::ImageFactory::open(filePath.toStdWString());
     assert (image.get() != 0);
     image->readMetadata();
     Exiv2::ExifData& ed = image->exifData();
