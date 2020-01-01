@@ -20,7 +20,7 @@ Window {
   property int buttonWidth: 200
   property int buttonMargin: 50
 
-  property int elementsCount:  photoListView.count
+  property int elementsCount:  photoModel.elementsCount
 
   function isCurrentOnePhotoItem() {
     return loader.source.toString().includes("OnePhotoItem.qml")
@@ -35,14 +35,6 @@ Window {
 
   PhotoModel {
     id: photoModel
-  }
-
-  // Только для получения актуального количества элементов в модели
-  ListView {
-    id: photoListView
-    model: photoModel
-    delegate: Text {}
-    visible: false
   }
 
   RowLayout {

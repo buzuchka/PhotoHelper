@@ -15,6 +15,9 @@ class PHOTOHELPER_EXPORT PhotoModel : public QAbstractListModel
              READ selectedIndexes
              WRITE setSelectedIndexes
              NOTIFY selectedIndexesChanged)
+  Q_PROPERTY(int elementsCount
+             READ elementsCount
+             NOTIFY elementsCountChanged)
 public:
   enum Roles {
     NameRole = Qt::UserRole + 1,
@@ -52,13 +55,20 @@ public:
   Q_INVOKABLE void rotateRight(int index);
   Q_INVOKABLE void rotateRightSelectedIndexes();
 
+  Q_INVOKABLE int elementsCount() const;
+
 signals:
   void selectedIndexesChanged();
-  void orientationListChanged();
+  void elementsCountChanged();
+
+protected:
+  bool canFetchMore(const QModelIndex &parent) const override;
+  void fetchMore(const QModelIndex &parent) override;
 
 private:
   QStringList m_pathList;
   QList<int> m_selectedIndexes;
+  unsigned int m_fetchedItemCount;
 };
 
 } // !PhotoHelper
