@@ -173,7 +173,7 @@ Item {
       Layout.fillWidth: true
       Layout.fillHeight: true
 
-      Layout.maximumHeight: 30
+      Layout.maximumHeight: 20
 
       Text {
           Layout.fillWidth: true
