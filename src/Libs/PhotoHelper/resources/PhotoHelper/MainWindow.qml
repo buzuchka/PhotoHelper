@@ -98,7 +98,7 @@ Window {
           onClicked: loader.setSource("OnePhotoItem.qml",
                                       {"photoModel": photoModel,
                                        "fileOperationHandler": fileOperationHandler,
-                                       "outsideIndex": loader.item.mainCurrentIndex
+                                       "outsideIndex": loader.item.mainCurrentIndex1
                                       })
         }
 
