@@ -8,11 +8,14 @@ import FileOperationHandler 1.0
 import FolderSet 1.0
 import PhotoModel 1.0
 
+import Proxy 1.0
+
 Window {
   id: root
 
   property FolderSet folderSet
   property FileOperationHandler fileOperationHandler
+  property Proxy proxy
 
   property int buttonWidth: 200
   property int buttonMargin: 50
@@ -51,12 +54,13 @@ Window {
       Layout.fillHeight: true
 
       Text {
+        id: replacingText
+
         Layout.fillWidth: true
         Layout.fillHeight: true
         Layout.alignment: Qt.AlignCenter
 
         visible: elementsCount == 0
-        text: qsTr("Нет изображений")
         color: "gray"
         font.pointSize: 20
         textFormat: Text.PlainText
@@ -115,6 +119,7 @@ Window {
         id: rotateButton
         Layout.fillWidth: true
         text: qsTr("Повернуть")
+        enabled: elementsCount > 0
         onClicked: loader.item.rotateRightPhoto()
       }
 
@@ -141,6 +146,7 @@ Window {
         delegate: Button {
           implicitWidth: buttonWidth
           text: model.name
+          enabled: elementsCount > 0
           action: Action {
             text: model.name
             shortcut: "Ctrl+"+(index+1)
@@ -148,20 +154,30 @@ Window {
           onClicked: loader.item.copyPhoto(model.path)
         }
         model: DestinationFolderModel {
-          id: destinationModel
+          id: destinationButtonModel
         }
       }      
     }
   }
-  Component.onCompleted: {
-    photoModel.setData(fileOperationHandler.getImagesPathList(folderSet.sourcePath),
-                       fileOperationHandler.getImagesOrientationList(folderSet.sourcePath))
-    destinationModel.init()
 
-    if (elementsCount > 0) {
-      loader.setSource("OnePhotoItem.qml",
-                       {"photoModel": photoModel,
-                        "fileOperationHandler": fileOperationHandler})
+  Connections {
+    target: proxy
+    onLoadingFinished: {
+      replacingText.text = qsTr("Нет изображений")
+      photoModel.setData(proxy.getImagesPathList())
+
+      if (elementsCount > 0) {
+        loader.setSource("OnePhotoItem.qml",
+                         {"photoModel": photoModel,
+                          "fileOperationHandler": fileOperationHandler})
+      }
     }
+  }
+
+  Component.onCompleted: {
+    replacingText.text = qsTr("Загрузка изображений")
+
+    destinationButtonModel.init()
+    proxy.startLoading(folderSet.sourcePath)
   }
 }

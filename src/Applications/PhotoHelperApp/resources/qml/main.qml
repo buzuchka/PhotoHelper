@@ -9,6 +9,7 @@ InitialDialog {
 
     folderSet: cppFolderSet
     fileOperationHandler: cppFileOperationHandler
+    proxy: cppProxy
 
     Component.onCompleted: show()
 }

@@ -1,6 +1,7 @@
 #include "FileOperationHandler.h"
 
 #include <QDateTime>
+#include <QDebug>
 #include <QDir>
 
 #include <exiv2/exiv2.hpp>
@@ -174,6 +175,21 @@ void FileOperationHandler::rotateRightImages(const QStringList &pathList)
 {
   for(auto & path : pathList)
     rotateRightImage(path);
+}
+
+int FileOperationHandler::getImageOrientation(const QString &filePath)
+{
+  Exiv2::Image::AutoPtr image = Exiv2::ImageFactory::open(filePath.toStdWString());
+  assert (image.get() != 0);
+  image->readMetadata();
+  Exiv2::ExifData& ed = image->exifData();
+  if (ed.empty())
+    qDebug() << filePath + ": No Exif data found in the file";
+
+  auto orientationExif = ed["Exif.Image.Orientation"].toLong();
+  RightOrientation orientation = orientationByExifNumber(orientationExif);
+
+  return static_cast<int>(orientation);
 }
 
 } // !PhotoHelper

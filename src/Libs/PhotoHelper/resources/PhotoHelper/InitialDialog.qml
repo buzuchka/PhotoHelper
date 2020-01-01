@@ -6,14 +6,18 @@ import QtQuick.Window 2.13
 
 import FolderSet 1.0
 import FileOperationHandler 1.0
+import Proxy 1.0
 
 Window {
   id: root
 
   property FolderSet folderSet
   property FileOperationHandler fileOperationHandler
+  property Proxy proxy
 
   property int firstColumnWidth: 200
+
+  property var mainComponent;
 
   function saveModel(model, set) {
     for(var i = 0; i < model.count; ++i) {
@@ -180,6 +184,7 @@ Window {
           var window    = component.createObject(root,
                                                  {folderSet: root.folderSet,
                                                   fileOperationHandler: root.fileOperationHandler,
+                                                  proxy: root.proxy,
                                                   title: root.title})
           window.show()
         }

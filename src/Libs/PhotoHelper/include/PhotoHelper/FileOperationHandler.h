@@ -39,11 +39,14 @@ public:
   Q_INVOKABLE void deleteFile(const QString &filePath);
   Q_INVOKABLE void deleteFiles(const QStringList &filePathList);
 
-  Q_INVOKABLE QStringList getImagesPathList(const QString &path);
+  static QStringList getImagesPathList(const QString &path);
   Q_INVOKABLE QStringList getImagesOrientationList(const QString &path);
 
+  // Возвращает ориентацию изоюражения
+  static int getImageOrientation(const QString &path);
+
   // Поворот изображения вправо
-   Q_INVOKABLE void rotateRightImage(const QString &filePath);
+   static void rotateRightImage(const QString &filePath);
 
   // Поворот нескольких изображений вправо
   Q_INVOKABLE void rotateRightImages(const QStringList &filePathList);

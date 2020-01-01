@@ -1,5 +1,7 @@
 #include "PhotoModel.h"
 
+#include "FileOperationHandler.h"
+
 #include <QDir>
 #include <QFileInfo>
 
@@ -34,7 +36,7 @@ QVariant PhotoModel::data(const QModelIndex &index, int role) const
   case SelectedRole:
     return m_selectedIndexes.contains(index.row());
   case OrientationRole:
-    return m_orientationList.at(index.row()).toInt();
+    return FileOperationHandler::getImageOrientation(m_pathList.at(index.row()));
   default:
       return QVariant();
   }
@@ -51,12 +53,10 @@ QHash<int, QByteArray> PhotoModel::roleNames() const
   return roles;
 }
 
-void PhotoModel::setData(const QStringList &pathList,
-                         const QStringList &orientationList)
+void PhotoModel::setData(const QStringList &pathList)
 {
   beginResetModel();
   m_pathList = pathList;
-  m_orientationList = orientationList;
   endResetModel();
 }
 
@@ -112,30 +112,12 @@ void PhotoModel::setSelectedIndexes(const QList<int> &indexes)
   emit selectedIndexesChanged();
 }
 
-QStringList PhotoModel::orientationList() const
-{
-  return m_orientationList;
-}
-
-int PhotoModel::getOrientation(int index)
-{
-  return m_orientationList.at(index).toInt();
-}
-
 void PhotoModel::rotateRight(int index)
 {
-  int oldOrientation = m_orientationList.at(index).toInt();
-  int newOrientation = 0;
-
-  if(oldOrientation < 3)
-    newOrientation = oldOrientation + 1;
-
-  m_orientationList[index] = QString::number(newOrientation);
+  FileOperationHandler::rotateRightImage(m_pathList.at(index));
 
   QModelIndex ind = createIndex(index, index);
   emit dataChanged(ind, ind);
-
-  emit orientationListChanged();
 }
 
 void PhotoModel::rotateRightSelectedIndexes()

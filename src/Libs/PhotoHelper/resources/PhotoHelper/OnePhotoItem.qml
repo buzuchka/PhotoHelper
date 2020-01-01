@@ -29,7 +29,6 @@ Item {
 
   function rotateRightPhoto() {
     photoModel.rotateRight(mainCurrentIndex)
-    fileOperationHandler.rotateRightImage(photoModel.getFilePath(mainCurrentIndex))
     photoListView.forceActiveFocus()
   }
 
