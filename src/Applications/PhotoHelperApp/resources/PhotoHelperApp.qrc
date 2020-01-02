@@ -2,6 +2,12 @@
     <qresource prefix="/">
         <file>qtquickcontrols2.conf</file>
         <file alias="main.qml">qml/main.qml</file>
-		<file alias="icons/logo">icons/logo.png</file>
+        <file alias="icons/logo">icons/logo.png</file>
+        <file alias="icons/back">icons/back.png</file>
+        <file alias="icons/forward">icons/forward.png</file>
+        <file alias="icons/trash">icons/trash.png</file>
+        <file alias="icons/turn_right">icons/turn_right.png</file>
+        <file alias="icons/all_photos">icons/all_photos.png</file>
+        <file alias="icons/one_photo">icons/one_photo.png</file>
     </qresource>
 </RCC>

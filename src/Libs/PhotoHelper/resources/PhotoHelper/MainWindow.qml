@@ -17,7 +17,7 @@ Window {
   property FileOperationHandler fileOperationHandler
   property Proxy proxy
 
-  property int buttonWidth: 200
+  property int buttonWidth: 100
   property int buttonMargin: 50
 
   property int elementsCount:  photoModel.elementsCount
@@ -77,40 +77,51 @@ Window {
       Layout.fillHeight: true
       Layout.maximumWidth: buttonWidth
 
-      RowLayout {
-        Layout.fillWidth: true
-        Layout.fillHeight: true
-        Layout.maximumWidth: buttonWidth
+      Button {
+        Layout.preferredWidth: buttonWidth
+        Layout.preferredHeight: buttonWidth
 
-        Button {
-          Layout.fillWidth: true
+        icon.height: buttonWidth
+        icon.width: buttonWidth
+        icon.color: enabled ? "transparent" : "lightgrey"
+        icon.source: "qrc:/icons/one_photo"
 
-          text: "One"
-          enabled: isCurrentAllPhotoItem()
-          onClicked: loader.setSource("OnePhotoItem.qml",
-                                      {"photoModel": photoModel,
-                                       "fileOperationHandler": fileOperationHandler,
-                                       "outsideIndex": loader.item.mainCurrentIndex1
-                                      })
-        }
+        enabled: isCurrentAllPhotoItem()
+        onClicked: loader.setSource("OnePhotoItem.qml",
+                                    {"photoModel": photoModel,
+                                     "fileOperationHandler": fileOperationHandler,
+                                     "outsideIndex": loader.item.mainCurrentIndex1
+                                    })
+      }
 
-        Button {
-          Layout.fillWidth: true
+      Button {
+        Layout.preferredWidth: buttonWidth
+        Layout.preferredHeight: buttonWidth
 
-          text: "All"
-          enabled:isCurrentOnePhotoItem()
-          onClicked: loader.setSource("AllPhotoItem.qml",
-                                      {"photoModel": photoModel,
-                                       "fileOperationHandler": fileOperationHandler,
-                                       "outsideIndex": loader.item.mainCurrentIndex
-                                      })
-        }
+        icon.height: buttonWidth
+        icon.width: buttonWidth
+        icon.color: enabled ? "transparent" : "lightgrey"
+        icon.source: "qrc:/icons/all_photos"
+
+        enabled:isCurrentOnePhotoItem()
+        onClicked: loader.setSource("AllPhotoItem.qml",
+                                    {"photoModel": photoModel,
+                                     "fileOperationHandler": fileOperationHandler,
+                                     "outsideIndex": loader.item.mainCurrentIndex
+                                    })
       }
 
       Button {
         id: rotateButton
-        Layout.fillWidth: true
-        text: qsTr("Повернуть")
+
+        Layout.preferredWidth: buttonWidth
+        Layout.preferredHeight: buttonWidth
+
+        icon.height: buttonWidth
+        icon.width: buttonWidth
+        icon.color: enabled ? "transparent" : "lightgrey"
+        icon.source: "qrc:/icons/turn_right"
+
         enabled: elementsCount > 0
         onClicked: loader.item.rotateRightPhoto()
       }
@@ -118,9 +129,14 @@ Window {
       Button {
         id: deleteButton
 
-        Layout.fillWidth: true
+        Layout.preferredWidth: buttonWidth
+        Layout.preferredHeight: buttonWidth
 
-        text: qsTr("Удалить")
+        icon.height: buttonWidth
+        icon.width: buttonWidth
+        icon.color: enabled ? "transparent" : "lightgrey"
+        icon.source: "qrc:/icons/trash"
+
         enabled: elementsCount > 0
         action: Action {
           text: qsTr("Удалить")
