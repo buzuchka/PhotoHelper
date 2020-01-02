@@ -7,6 +7,9 @@ Item {
   property var photoModel
   property var fileOperationHandler
 
+  property string currentPhotoIndexText: view.count + " " + qsTr("фото")
+  property string currentPhotoNameText: ""
+
   property int photoSize: 200
   property int photoSpacing: 10
 
@@ -17,6 +20,12 @@ Item {
   property int mainCurrentIndex1: photoModel.selectedIndexes.length > 0 ?
                                      photoModel.selectedIndexes[0] :
                                      0
+
+  function forwardClicked() {
+  }
+
+  function backClicked() {
+  }
 
   function copyPhoto(path) {
       fileOperationHandler.copyFiles(
@@ -166,21 +175,6 @@ Item {
           else
             wheel.accepted = false
         }
-      }
-    }
-
-    RowLayout {
-      Layout.fillWidth: true
-      Layout.fillHeight: true
-
-      Layout.maximumHeight: 20
-
-      Text {
-          Layout.fillWidth: true
-          Layout.fillHeight: true
-          verticalAlignment: Text.AlignVCenter
-
-          text: view.count + " " + qsTr("фото")
       }
     }
   }

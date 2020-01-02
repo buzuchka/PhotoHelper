@@ -7,9 +7,28 @@ Item {
   property var photoModel
   property var fileOperationHandler
 
+  property string currentPhotoIndexText: (mainCurrentIndex + 1) + " / " + elementsCount + " " + qsTr("фото")
+  property string currentPhotoNameText
+
   property int mainCurrentIndex: 0
 
   property int outsideIndex: -1
+
+  function forwardClicked() {
+    if(mainCurrentIndex < elementsCount - 1) {
+      mainCurrentIndex++
+      photoListView.positionViewAtIndex(mainCurrentIndex, ListView.Beginning)
+      updateCurrentNameLabel()
+    }
+  }
+
+  function backClicked() {
+    if(elementsCount > 0 && mainCurrentIndex >= 1) {
+      mainCurrentIndex--
+      photoListView.positionViewAtIndex(mainCurrentIndex, ListView.Beginning)
+      updateCurrentNameLabel()
+    }
+  }
 
   function copyPhoto(path) {
     fileOperationHandler.copyFile(
@@ -33,7 +52,7 @@ Item {
   }
 
   function updateCurrentNameLabel() {
-    photoNameLabel.text = photoModel.getFileName(mainCurrentIndex)
+    currentPhotoNameText = photoModel.getFileName(mainCurrentIndex)
   }
 
   ColumnLayout {
@@ -78,53 +97,10 @@ Item {
       }
 
       Keys.onLeftPressed: {
-        if(elementsCount > 0 && mainCurrentIndex >= 1) {
-          mainCurrentIndex--
-          photoListView.positionViewAtIndex(mainCurrentIndex, ListView.Beginning)
-          updateCurrentNameLabel()
-        }
+        backClicked()
       }
       Keys.onRightPressed: {
-        if(mainCurrentIndex < elementsCount - 1) {
-          mainCurrentIndex++
-          photoListView.positionViewAtIndex(mainCurrentIndex, ListView.Beginning)
-          updateCurrentNameLabel()
-        }
-      }
-    }
-
-    RowLayout {
-      Layout.fillWidth: true
-      Layout.fillHeight: true
-
-      Layout.maximumHeight: 20
-
-      Item {
-        Layout.fillWidth: true
-        Layout.fillHeight: true
-
-        Text {
-          anchors.fill: parent
-          verticalAlignment: Text.AlignVCenter
-
-          visible: mainCurrentIndex >= 0 ? true : false
-          text: (mainCurrentIndex + 1) + " / " + elementsCount + " " + qsTr("фото")
-        }
-      }
-
-      Item {
-        Layout.fillWidth: true
-        Layout.fillHeight: true
-
-        Text {
-          id: photoNameLabel
-
-          anchors.fill: parent
-          verticalAlignment: Text.AlignVCenter
-          horizontalAlignment: Text.AlignRight
-
-          visible: elementsCount > 0 && mainCurrentIndex >= 0
-        }
+        forwardClicked()
       }
     }
   }

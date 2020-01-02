@@ -44,6 +44,52 @@ Window {
     ColumnLayout {
       Layout.fillWidth: true
       Layout.fillHeight: true
+      Layout.maximumWidth: buttonWidth
+
+      Button {
+        Layout.preferredWidth: buttonWidth
+        Layout.preferredHeight: buttonWidth
+
+        icon.height: buttonWidth
+        icon.width: buttonWidth
+        icon.color: enabled ? "transparent" : "lightgrey"
+        icon.source: "qrc:/icons/forward"
+
+        enabled: elementsCount > 0
+        onClicked: loader.item.forwardClicked()
+      }
+
+      Button {
+        Layout.preferredWidth: buttonWidth
+        Layout.preferredHeight: buttonWidth
+
+        icon.height: buttonWidth
+        icon.width: buttonWidth
+        icon.color: enabled ? "transparent" : "lightgrey"
+        icon.source: "qrc:/icons/back"
+
+        enabled: elementsCount > 0
+        onClicked: loader.item.backClicked()
+      }
+
+      Text {
+         Layout.fillHeight: true
+      }
+
+      Text {
+        visible: elementsCount > 0
+        text: loader.item.currentPhotoNameText
+      }
+
+      Text {
+        visible: elementsCount > 0
+        text: loader.item.currentPhotoIndexText
+      }
+    }
+
+    ColumnLayout {
+      Layout.fillWidth: true
+      Layout.fillHeight: true
 
       Text {
         id: replacingText
