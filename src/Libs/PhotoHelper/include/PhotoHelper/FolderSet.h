@@ -38,6 +38,9 @@ public:
                                       const QString &name,
                                       const QString &path);
 
+  Q_INVOKABLE void setLastOperatedIndex(int index);
+  Q_INVOKABLE int getLastOperatedIndex() const;
+
   Q_INVOKABLE QVariantList getDestinationVariantList() const;
 
   Q_INVOKABLE FolderConfigList getDestinationPathList() const;
@@ -47,9 +50,11 @@ signals:
   void sourceNameChanged();
   void sourcePathChanged();
   void destinationPathListChanged();
+  void lastOperatedIndexChanged();
 
 private:
-  FolderConfigPair m_sourcePath;                 ///< Путь до папки для разбора
+  FolderConfigPair m_sourcePath;           ///< Путь до папки для разбора
+  int m_lastOperatedIndex;                 ///< Индекс последнего обработанного изображения
   FolderConfigList m_destinationPathList;  ///< Пути до папок назначения
 };
 

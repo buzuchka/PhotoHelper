@@ -5,6 +5,7 @@
 namespace PhotoHelper {
 
 FolderSet::FolderSet()
+  : m_lastOperatedIndex(0)
 {
 }
 
@@ -78,6 +79,17 @@ void FolderSet::setDestinationPath(int index,
     m_destinationPathList[index].second=path;
   }
   emit destinationPathListChanged();
+}
+
+void FolderSet::setLastOperatedIndex(int index)
+{
+  m_lastOperatedIndex = index;
+  emit lastOperatedIndexChanged();
+}
+
+int FolderSet::getLastOperatedIndex() const
+{
+  return m_lastOperatedIndex;
 }
 
 } // !PhotoHelper

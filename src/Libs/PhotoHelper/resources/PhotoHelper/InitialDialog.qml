@@ -227,6 +227,7 @@ Window {
       if(fileUrlString.startsWith("file://"))
         fileUrlString = fileUrlString.replace("file:","")
       sourcePathTextField.text = fileUrlString
+      folderSet.setLastOperatedIndex(0)
       close()
     }
     onRejected: {

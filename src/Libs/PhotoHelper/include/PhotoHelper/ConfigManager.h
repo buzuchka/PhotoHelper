@@ -24,6 +24,9 @@ public:
   FolderConfigPair getSourceFolderPair();
   void setSourcePath(const FolderConfigPair &path);
 
+  void setLastOperatedIndex(int index);
+  int getLastOperatedIndex();
+
   FolderConfigList getDestinationPathList();
   void setDestinationPathList(const FolderConfigList & folderList);
 

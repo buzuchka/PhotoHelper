@@ -16,6 +16,8 @@ namespace PhotoHelper {
 const QString sourceDirNameProperty = QLatin1String("SourceDirName");
 const QString sourceDirPathProperty = QLatin1String("SourceDirPath");
 
+const QString lastOperatedIndexProperty = QLatin1String("LastOperatedIndex");
+
 const QString destinationPathListNameGroup("DestinationPathList");
 const QString folderNameProperty("FolderName");
 const QString folderPathProperty("FolderPath");
@@ -58,6 +60,16 @@ void ConfigManager::setSourcePath(const FolderConfigPair &folderPair)
 {
   setValue(sourceDirNameProperty, folderPair.first);
   setValue(sourceDirPathProperty, folderPair.second);
+}
+
+void ConfigManager::setLastOperatedIndex(int index)
+{
+  setValue(lastOperatedIndexProperty, index);
+}
+
+int ConfigManager::getLastOperatedIndex()
+{
+  return getStringValue(lastOperatedIndexProperty).toInt();
 }
 
 FolderConfigList ConfigManager::getDestinationPathList()

@@ -223,7 +223,8 @@ Window {
       if (elementsCount > 0) {
         loader.setSource("OnePhotoItem.qml",
                          {"photoModel": photoModel,
-                          "fileOperationHandler": fileOperationHandler})
+                          "fileOperationHandler": fileOperationHandler,
+                          "outsideIndex": folderSet.getLastOperatedIndex()})
       }
     }
   }
@@ -234,4 +235,6 @@ Window {
     destinationButtonModel.init()
     proxy.startLoading(folderSet.sourcePath)
   }
+
+  onVisibilityChanged: if(!visible) folderSet.setLastOperatedIndex(loader.item.mainCurrentIndex)
 }

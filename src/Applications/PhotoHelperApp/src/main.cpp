@@ -49,6 +49,7 @@ int main(int argc, char** argv)
 
   FolderSet folderSet;
   folderSet.setSourcePath(configManager->getSourceFolderPair());
+  folderSet.setLastOperatedIndex(configManager->getLastOperatedIndex());
   folderSet.setDestinationPathList(configManager->getDestinationPathList());
 
   QObject::connect(&folderSet, &FolderSet::sourcePathChanged,
@@ -61,6 +62,11 @@ int main(int argc, char** argv)
           [configManager, &folderSet]()
   {
     configManager->setDestinationPathList(folderSet.getDestinationPathList());
+  });
+  QObject::connect(&folderSet, &FolderSet::lastOperatedIndexChanged,
+          [configManager, &folderSet]()
+  {
+    configManager->setLastOperatedIndex(folderSet.getLastOperatedIndex());
   });
 
   Proxy proxy;
