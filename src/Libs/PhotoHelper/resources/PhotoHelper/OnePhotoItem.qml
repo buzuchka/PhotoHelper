@@ -19,6 +19,7 @@ Item {
       mainCurrentIndex++
       photoListView.positionViewAtIndex(mainCurrentIndex, ListView.Beginning)
       updateCurrentNameLabel()
+      photoListView.forceActiveFocus()
     }
   }
 
@@ -27,6 +28,7 @@ Item {
       mainCurrentIndex--
       photoListView.positionViewAtIndex(mainCurrentIndex, ListView.Beginning)
       updateCurrentNameLabel()
+      photoListView.forceActiveFocus()
     }
   }
 

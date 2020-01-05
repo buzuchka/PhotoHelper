@@ -78,12 +78,12 @@ Window {
 
       Text {
         visible: elementsCount > 0
-        text: loader.item.currentPhotoNameText
+        text: loader.item ? loader.item.currentPhotoNameText : ""
       }
 
       Text {
         visible: elementsCount > 0
-        text: loader.item.currentPhotoIndexText
+        text: loader.item ? loader.item.currentPhotoIndexText : ""
       }
     }
 

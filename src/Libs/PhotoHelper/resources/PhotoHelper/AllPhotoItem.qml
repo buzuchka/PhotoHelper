@@ -7,7 +7,7 @@ Item {
   property var photoModel
   property var fileOperationHandler
 
-  property string currentPhotoIndexText: view.count + " " + qsTr("фото")
+  property string currentPhotoIndexText: elementsCount + " " + qsTr("фото")
   property string currentPhotoNameText: ""
 
   property int photoSize: 200
