@@ -58,6 +58,22 @@ void FolderSet::setDestinationPathList(const FolderConfigList &list)
   emit destinationPathListChanged();
 }
 
+QStringList FolderSet::getDestinationPathNameListAsList() const
+{
+  QStringList result;
+  for(int i = 0; i < m_destinationPathList.count(); ++i)
+    result.append(m_destinationPathList.at(i).first);
+  return result;
+}
+
+QStringList FolderSet::getDestinationPathListAsList() const
+{
+  QStringList result;
+  for(int i = 0; i < m_destinationPathList.count(); ++i)
+    result.append(m_destinationPathList.at(i).second);
+  return result;
+}
+
 QString FolderSet::getDestinationName(int index) const
 {
     return m_destinationPathList.at(index).first;

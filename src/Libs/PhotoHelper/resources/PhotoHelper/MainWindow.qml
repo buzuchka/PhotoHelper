@@ -35,6 +35,8 @@ Window {
 
   PhotoModel {
     id: photoModel
+    destinationPathList: folderSet.getDestinationPathListAsList()
+    destinationPathNameList: folderSet.getDestinationPathNameListAsList()
   }
 
   RowLayout {
@@ -199,6 +201,8 @@ Window {
 
         delegate: Button {
           implicitWidth: buttonWidth
+          implicitHeight: buttonWidth
+
           text: model.name
           enabled: elementsCount > 0
           action: Action {
@@ -206,6 +210,19 @@ Window {
             shortcut: "Ctrl+"+(index+1)
           }
           onClicked: loader.item.copyPhoto(model.path)
+
+          Rectangle {
+            anchors.top: parent.top
+            anchors.right: parent.right
+            anchors.topMargin: 10
+            anchors.rightMargin: 5
+
+            width: 15
+            height: width
+
+            border.width: 1
+            color: model.color
+          }
         }
         model: DestinationFolderModel {
           id: destinationButtonModel
@@ -236,5 +253,6 @@ Window {
     proxy.startLoading(folderSet.sourcePath)
   }
 
-  onVisibilityChanged: if(!visible) folderSet.setLastOperatedIndex(loader.item.mainCurrentIndex)
+  onVisibilityChanged: if(!visible)
+                         folderSet.setLastOperatedIndex(loader.item.mainCurrentIndex)
 }

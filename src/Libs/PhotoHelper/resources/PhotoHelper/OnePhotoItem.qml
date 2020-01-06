@@ -36,6 +36,7 @@ Item {
     fileOperationHandler.copyFile(
           photoModel.getFilePath(mainCurrentIndex),
           path)
+    photoModel.updateData(mainCurrentIndex)
     photoListView.forceActiveFocus()
   }
 
@@ -80,6 +81,28 @@ Item {
 
         clip: true
 
+        // Индикаторы наличия в папках
+        Row {
+          anchors {
+            top: parent.top
+            right: parent.right
+          }
+
+          spacing: 5
+
+          Repeater {
+            model: dircontains
+
+            Rectangle {
+              color: modelData
+              width: 20
+              height: 20
+              border.width: 2
+            }
+          }
+        }
+
+        // Изображение
         Image {
           id: photo
 

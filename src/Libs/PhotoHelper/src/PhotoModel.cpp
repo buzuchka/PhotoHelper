@@ -35,6 +35,10 @@ QVariant PhotoModel::data(const QModelIndex &index, int role) const
     return m_selectedIndexes.contains(index.row());
   case OrientationRole:
     return FileOperationHandler::getImageOrientation(m_pathList.at(index.row()));
+  case ContainsRole:
+    return FileOperationHandler::getContainsFolderColors(m_pathList.at(index.row()),
+                                                         m_destinationPathList,
+                                                         m_destinationPathNameList);
   default:
       return QVariant();
   }
@@ -47,6 +51,7 @@ QHash<int, QByteArray> PhotoModel::roleNames() const
   roles[PathRole] = "path";
   roles[SelectedRole] = "selected";
   roles[OrientationRole] = "orientation";
+  roles[ContainsRole] = "dircontains";
 
   return roles;
 }
@@ -116,9 +121,7 @@ void PhotoModel::setSelectedIndexes(const QList<int> &indexes)
 void PhotoModel::rotateRight(int index)
 {
   FileOperationHandler::rotateRightImage(m_pathList.at(index));
-
-  QModelIndex ind = createIndex(index, index);
-  emit dataChanged(ind, ind);
+  updateData(index);
 }
 
 void PhotoModel::rotateRightSelectedIndexes()
@@ -130,6 +133,34 @@ void PhotoModel::rotateRightSelectedIndexes()
 int PhotoModel::elementsCount() const
 {
   return m_pathList.size();
+}
+
+void PhotoModel::setDestinationPathList(const QStringList &pathList)
+{
+  m_destinationPathList = pathList;
+  emit destinationPathListChanged();
+}
+
+QStringList PhotoModel::getDestinationPathList()
+{
+  return m_destinationPathList;
+}
+
+void PhotoModel::setDestinationPathNameList(const QStringList &nameList)
+{
+  m_destinationPathNameList = nameList;
+  emit destinationPathNameListChanged();
+}
+
+QStringList PhotoModel::getDestinationPathNameList()
+{
+  return m_destinationPathNameList;
+}
+
+void PhotoModel::updateData(int index)
+{
+  QModelIndex ind = createIndex(index, index);
+  emit dataChanged(ind, ind);
 }
 
 bool PhotoModel::canFetchMore(const QModelIndex &parent) const

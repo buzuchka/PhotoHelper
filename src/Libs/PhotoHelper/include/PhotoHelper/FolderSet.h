@@ -46,6 +46,9 @@ public:
   Q_INVOKABLE FolderConfigList getDestinationPathList() const;
   void setDestinationPathList(const FolderConfigList &list);
 
+  Q_INVOKABLE QStringList getDestinationPathNameListAsList() const;
+  Q_INVOKABLE QStringList getDestinationPathListAsList() const;
+
 signals:
   void sourceNameChanged();
   void sourcePathChanged();

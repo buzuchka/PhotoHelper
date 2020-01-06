@@ -15,9 +15,11 @@ class PHOTOHELPER_EXPORT DestinationFolderModel : public QAbstractListModel
 {
   Q_OBJECT
 public:
-    enum Roles {
-        NameRole = Qt::UserRole + 1,
-        PathRole
+    enum Roles
+    {
+      NameRole = Qt::UserRole + 1,
+      ColorRole,
+      PathRole
     };
 
     DestinationFolderModel(QObject *parent = nullptr);

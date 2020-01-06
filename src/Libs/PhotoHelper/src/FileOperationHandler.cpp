@@ -1,5 +1,6 @@
 #include "FileOperationHandler.h"
 
+#include <QColor>
 #include <QDateTime>
 #include <QDebug>
 #include <QDir>
@@ -9,6 +10,8 @@
 #include <unordered_map>
 
 namespace PhotoHelper {
+
+QColor GetColorByName(const QString& name);
 
 std::unordered_map<int, RightOrientation> exifOrientationMap = {
   {1, RightOrientation::Normal},
@@ -190,6 +193,33 @@ int FileOperationHandler::getImageOrientation(const QString &filePath)
   RightOrientation orientation = orientationByExifNumber(orientationExif);
 
   return static_cast<int>(orientation);
+}
+QStringList FileOperationHandler::getContainsFolderColors(QString const& filePath,
+                                                          QStringList const& dirList,
+                                                          QStringList const& nameList)
+{
+  QStringList colorList;
+  QFile file(filePath);
+
+  QFileInfo fileInfo(file);
+  QString fileName = fileInfo.baseName();
+
+  for(int i = 0; i < dirList.count(); ++i)
+  {
+    QFileInfoList destFileInfoList = QDir(dirList.at(i)).entryInfoList(
+                                                      {fileName + "*"},
+                                                      QDir::Files |
+                                                      QDir::NoSymLinks |
+                                                      QDir::NoDotAndDotDot);
+    for(QFileInfo const& destFileInfo : destFileInfoList)
+    {
+      if(destFileInfo.size() == file.size()) {
+        colorList.append(GetColorByName(nameList.at(i)).name());
+        break;
+      }
+    }
+  }
+  return colorList;
 }
 
 } // !PhotoHelper
