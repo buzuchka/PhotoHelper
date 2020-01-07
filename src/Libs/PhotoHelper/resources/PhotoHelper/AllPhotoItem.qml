@@ -28,9 +28,11 @@ Item {
   }
 
   function copyPhoto(path) {
-      fileOperationHandler.copyFiles(
-            photoModel.getFilePathList(photoModel.selectedIndexes),
-            path)
+    fileOperationHandler.copyFiles(
+          photoModel.getFilePathList(photoModel.selectedIndexes),
+          path)
+    for(var i = 0; i < photoModel.selectedIndexes.length; ++i)
+      photoModel.emitUpdateData(photoModel.selectedIndexes[i])
   }
 
   function deletePhoto() {
@@ -107,6 +109,7 @@ Item {
 
             clip: true
 
+            // Изображение
             Image {
               id: photo
 
@@ -125,6 +128,29 @@ Item {
 
               rotation: 90 * model.orientation
             }
+
+            // Индикаторы наличия в папках
+            Row {
+              anchors {
+                top: parent.top
+                right: parent.right
+              }
+
+              spacing: photoSize / 20
+
+              Repeater {
+                model: dircontains
+
+                Rectangle {
+                  color: modelData
+                  width: photoSize / 10
+                  height: width
+                  border.width: 1
+                }
+              }
+            }
+
+
           }
 
           Text {

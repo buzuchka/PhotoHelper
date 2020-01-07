@@ -81,6 +81,24 @@ Item {
 
         clip: true
 
+        // Изображение
+        Image {
+          id: photo
+
+          anchors.centerIn: parent
+
+          width: (model.orientation === 0) || (model.orientation === 2) ?
+                   parent.width : parent.height
+          height: (model.orientation === 0) || (model.orientation === 2) ?
+                   parent.height : parent.width
+
+          cache: false
+          fillMode: Image.PreserveAspectFit
+          source: "file:" + model.path
+
+          rotation: 90 * model.orientation
+        }
+
         // Индикаторы наличия в папках
         Row {
           anchors {
@@ -100,24 +118,6 @@ Item {
               border.width: 2
             }
           }
-        }
-
-        // Изображение
-        Image {
-          id: photo
-
-          anchors.centerIn: parent
-
-          width: (model.orientation === 0) || (model.orientation === 2) ?
-                   parent.width : parent.height
-          height: (model.orientation === 0) || (model.orientation === 2) ?
-                   parent.height : parent.width
-
-          cache: false
-          fillMode: Image.PreserveAspectFit
-          source: "file:" + model.path
-
-          rotation: 90 * model.orientation
         }
       }
 
