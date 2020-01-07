@@ -75,6 +75,9 @@ public:
   //! Отправляет сигнал об обновлении элемента
   Q_INVOKABLE void emitUpdateData(int index);
 
+private:
+  int getOrientation(int index) const;
+
 signals:
   void selectedIndexesChanged();
   void elementsCountChanged();
@@ -86,6 +89,7 @@ private:
   QList<int> m_selectedIndexes;          ///< Индексы выделенных элементов
   QStringList m_destinationPathList;     ///< Пути до папок назначения
   QStringList m_destinationPathNameList; ///< Названия папок назначения
+  mutable QHash<QString, int> m_orientationCache;
 };
 
 } // !PhotoHelper

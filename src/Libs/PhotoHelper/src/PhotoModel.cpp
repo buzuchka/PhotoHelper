@@ -33,7 +33,7 @@ QVariant PhotoModel::data(const QModelIndex &index, int role) const
   case SelectedRole:
     return m_selectedIndexes.contains(index.row());
   case OrientationRole:
-    return FileOperationHandler::getImageOrientation(m_pathList.at(index.row()));
+    return getOrientation(index.row());
   case ContainsRole:
     return FileOperationHandler::getContainsFolderColors(m_pathList.at(index.row()),
                                                          m_destinationPathList,
@@ -159,6 +159,18 @@ void PhotoModel::emitUpdateData(int index)
 {
   QModelIndex ind = createIndex(index, index);
   emit dataChanged(ind, ind);
+}
+
+int PhotoModel::getOrientation(int index)const
+{
+  QString filePath(m_pathList.at(index));
+
+  if(m_orientationCache.contains(filePath))
+    return m_orientationCache.value(filePath);
+
+  int orientation = FileOperationHandler::getImageOrientation(filePath);
+  m_orientationCache.insert(filePath, orientation);
+  return orientation;
 }
 
 } // !PhotoHelper
