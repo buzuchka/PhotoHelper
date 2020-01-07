@@ -81,14 +81,9 @@ signals:
   void destinationPathListChanged();
   void destinationPathNameListChanged();
 
-protected:
-  bool canFetchMore(const QModelIndex &parent) const override;
-  void fetchMore(const QModelIndex &parent) override;
-
 private:
   QStringList m_pathList;                ///< Список путей до изображений
   QList<int> m_selectedIndexes;          ///< Индексы выделенных элементов
-  unsigned int m_fetchedItemCount;       ///< Количество загруженных элементов
   QStringList m_destinationPathList;     ///< Пути до папок назначения
   QStringList m_destinationPathNameList; ///< Названия папок назначения
 };

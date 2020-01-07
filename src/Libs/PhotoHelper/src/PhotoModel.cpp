@@ -11,13 +11,12 @@ namespace PhotoHelper {
 
 PhotoModel::PhotoModel(QObject *parent)
   : QAbstractListModel(parent)
-  , m_fetchedItemCount(0)
 {
 }
 
 int PhotoModel::rowCount(const QModelIndex &parent) const
 {
-  return parent.isValid() ? 0 : m_fetchedItemCount;
+  return parent.isValid() ? 0 : m_pathList.size();
 }
 
 QVariant PhotoModel::data(const QModelIndex &index, int role) const
@@ -60,7 +59,6 @@ void PhotoModel::setData(const QStringList &pathList)
 {
   beginResetModel();
   m_pathList = pathList;
-  m_fetchedItemCount = 0;
   endResetModel();
 
   emit elementsCountChanged();
@@ -161,33 +159,6 @@ void PhotoModel::emitUpdateData(int index)
 {
   QModelIndex ind = createIndex(index, index);
   emit dataChanged(ind, ind);
-}
-
-bool PhotoModel::canFetchMore(const QModelIndex &parent) const
-{
-  if (parent.isValid())
-    return false;
-  return (m_fetchedItemCount < m_pathList.size());
-}
-
-void PhotoModel::fetchMore(const QModelIndex &parent)
-{
-  if (parent.isValid())
-    return;
-
-  int remainder = m_pathList.size() - m_fetchedItemCount;
-  int itemsToFetch = qMin(25, remainder);
-
-  if (itemsToFetch <= 0)
-    return;
-
-  beginInsertRows(QModelIndex(),
-                  m_fetchedItemCount,
-                  m_fetchedItemCount + itemsToFetch - 1);
-
-  m_fetchedItemCount += itemsToFetch;
-
-  endInsertRows();
 }
 
 } // !PhotoHelper
