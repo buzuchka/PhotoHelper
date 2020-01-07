@@ -204,10 +204,15 @@ QStringList FileOperationHandler::getContainsFolderColors(QString const& filePat
   QFileInfo fileInfo(file);
   QString fileName = fileInfo.baseName();
 
+  // Получить первые цифры из названия фото, если оно начинается на IMG_s
+  if(fileName.startsWith("IMG_"))
+    fileName = fileName.mid(4, 4);
+
   for(int i = 0; i < dirList.count(); ++i)
   {
     QFileInfoList destFileInfoList = QDir(dirList.at(i)).entryInfoList(
-                                                      {fileName + "*"},
+                                                      {"*" + fileName + "*.jpg",
+                                                       "*" + fileName + "*.jpeg"},
                                                       QDir::Files |
                                                       QDir::NoSymLinks |
                                                       QDir::NoDotAndDotDot);
