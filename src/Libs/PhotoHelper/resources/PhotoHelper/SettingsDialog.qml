@@ -5,21 +5,20 @@ import QtQuick.Layouts 1.3
 import QtQuick.Window 2.13
 
 import FolderSet 1.0
-import FileOperationHandler 1.0
-import Proxy 1.0
 
 Window {
   id: root
 
   property FolderSet folderSet
-  property FileOperationHandler fileOperationHandler
-  property Proxy proxy
 
   property int firstColumnWidth: 200
 
   property var mainComponent;
 
+  signal saveButtonClicked()
+
   function saveModel(model, set) {
+    set.clearDestinationPathList()
     for(var i = 0; i < model.count; ++i) {
       var listItem = model.get(i);
       set.setDestinationPath(i, listItem.name, listItem.path)
@@ -169,7 +168,7 @@ Window {
 
         Layout.alignment: Qt.AlignRight
 
-        text: qsTr("Дальше")
+        text: qsTr("Сохранить")
 
         enabled: listModel.count > 0 ? true : false
 
@@ -180,13 +179,7 @@ Window {
 
           root.visible = false
 
-          var component = Qt.createComponent("MainWindow.qml")
-          var window    = component.createObject(root,
-                                                 {folderSet: root.folderSet,
-                                                  fileOperationHandler: root.fileOperationHandler,
-                                                  proxy: root.proxy,
-                                                  title: root.title})
-          window.show()
+          saveButtonClicked()
         }
       }
     }

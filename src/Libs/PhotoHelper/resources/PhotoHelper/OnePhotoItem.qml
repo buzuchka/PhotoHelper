@@ -36,7 +36,7 @@ Item {
     fileOperationHandler.copyFile(
           photoModel.getFilePath(mainCurrentIndex),
           path)
-    photoModel.updateData(mainCurrentIndex)
+    photoModel.emitUpdateData(mainCurrentIndex)
     photoListView.forceActiveFocus()
   }
 

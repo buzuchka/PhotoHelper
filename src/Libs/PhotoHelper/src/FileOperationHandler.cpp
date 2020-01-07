@@ -213,7 +213,8 @@ QStringList FileOperationHandler::getContainsFolderColors(QString const& filePat
                                                       QDir::NoDotAndDotDot);
     for(QFileInfo const& destFileInfo : destFileInfoList)
     {
-      if(destFileInfo.size() == file.size()) {
+      if((destFileInfo.size() == file.size()) &&
+         (destFileInfo.lastModified() == fileInfo.lastModified())) {
         colorList.append(GetColorByName(nameList.at(i)).name());
         break;
       }

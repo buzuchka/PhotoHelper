@@ -74,6 +74,12 @@ QStringList FolderSet::getDestinationPathListAsList() const
   return result;
 }
 
+void FolderSet::clearDestinationPathList()
+{
+  m_destinationPathList.clear();
+  emit destinationPathListChanged();
+}
+
 QString FolderSet::getDestinationName(int index) const
 {
     return m_destinationPathList.at(index).first;

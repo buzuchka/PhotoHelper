@@ -73,7 +73,7 @@ public:
   Q_INVOKABLE QStringList getDestinationPathNameList();
 
   //! Отправляет сигнал об обновлении элемента
-  Q_INVOKABLE void updateData(int index);
+  Q_INVOKABLE void emitUpdateData(int index);
 
 signals:
   void selectedIndexesChanged();
@@ -86,9 +86,9 @@ protected:
   void fetchMore(const QModelIndex &parent) override;
 
 private:
-  QStringList m_pathList;
-  QList<int> m_selectedIndexes;
-  unsigned int m_fetchedItemCount;
+  QStringList m_pathList;                ///< Список путей до изображений
+  QList<int> m_selectedIndexes;          ///< Индексы выделенных элементов
+  unsigned int m_fetchedItemCount;       ///< Количество загруженных элементов
   QStringList m_destinationPathList;     ///< Пути до папок назначения
   QStringList m_destinationPathNameList; ///< Названия папок назначения
 };

@@ -30,6 +30,17 @@ Window {
     return loader.source.toString().includes("AllPhotoItem.qml")
   }
 
+  function reloadData() {
+    replacingText.text = qsTr("Загрузка изображений")
+
+    destinationButtonModel.init()
+
+    photoModel.setDestinationPathList(folderSet.getDestinationPathListAsList())
+    photoModel.setDestinationPathNameList(folderSet.getDestinationPathNameListAsList())
+
+    proxy.startLoading(folderSet.sourcePath)
+  }
+
   width: 800
   height: 800
 
@@ -47,6 +58,40 @@ Window {
       Layout.fillWidth: true
       Layout.fillHeight: true
       Layout.maximumWidth: buttonWidth
+
+      Button {
+        Layout.preferredWidth: buttonWidth
+        Layout.preferredHeight: buttonWidth
+
+        icon.height: buttonWidth
+        icon.width: buttonWidth
+        icon.color: enabled ? "transparent" : "lightgrey"
+        icon.source: "qrc:/icons/one_photo"
+
+        enabled: isCurrentAllPhotoItem()
+        onClicked: loader.setSource("OnePhotoItem.qml",
+                                    {"photoModel": photoModel,
+                                     "fileOperationHandler": fileOperationHandler,
+                                     "outsideIndex": loader.item.mainCurrentIndex1
+                                    })
+      }
+
+      Button {
+        Layout.preferredWidth: buttonWidth
+        Layout.preferredHeight: buttonWidth
+
+        icon.height: buttonWidth
+        icon.width: buttonWidth
+        icon.color: enabled ? "transparent" : "lightgrey"
+        icon.source: "qrc:/icons/all_photos"
+
+        enabled:isCurrentOnePhotoItem()
+        onClicked: loader.setSource("AllPhotoItem.qml",
+                                    {"photoModel": photoModel,
+                                     "fileOperationHandler": fileOperationHandler,
+                                     "outsideIndex": loader.item.mainCurrentIndex
+                                    })
+      }
 
       Button {
         Layout.preferredWidth: buttonWidth
@@ -126,40 +171,6 @@ Window {
       Layout.maximumWidth: buttonWidth
 
       Button {
-        Layout.preferredWidth: buttonWidth
-        Layout.preferredHeight: buttonWidth
-
-        icon.height: buttonWidth
-        icon.width: buttonWidth
-        icon.color: enabled ? "transparent" : "lightgrey"
-        icon.source: "qrc:/icons/one_photo"
-
-        enabled: isCurrentAllPhotoItem()
-        onClicked: loader.setSource("OnePhotoItem.qml",
-                                    {"photoModel": photoModel,
-                                     "fileOperationHandler": fileOperationHandler,
-                                     "outsideIndex": loader.item.mainCurrentIndex1
-                                    })
-      }
-
-      Button {
-        Layout.preferredWidth: buttonWidth
-        Layout.preferredHeight: buttonWidth
-
-        icon.height: buttonWidth
-        icon.width: buttonWidth
-        icon.color: enabled ? "transparent" : "lightgrey"
-        icon.source: "qrc:/icons/all_photos"
-
-        enabled:isCurrentOnePhotoItem()
-        onClicked: loader.setSource("AllPhotoItem.qml",
-                                    {"photoModel": photoModel,
-                                     "fileOperationHandler": fileOperationHandler,
-                                     "outsideIndex": loader.item.mainCurrentIndex
-                                    })
-      }
-
-      Button {
         id: rotateButton
 
         Layout.preferredWidth: buttonWidth
@@ -228,7 +239,28 @@ Window {
           id: destinationButtonModel
         }
       }      
+
+      Button {
+        id: settingsButton
+
+        Layout.preferredWidth: buttonWidth
+        Layout.preferredHeight: buttonWidth
+
+        icon.height: buttonWidth
+        icon.width: buttonWidth
+        icon.color: "transparent"
+        icon.source: "qrc:/icons/settings"
+
+        onClicked: settingsDialog.show()
+      }
     }
+  }
+
+  SettingsDialog {
+    id: settingsDialog
+    folderSet: root.folderSet
+    title: root.title
+    onSaveButtonClicked: reloadData()
   }
 
   Connections {
@@ -247,10 +279,7 @@ Window {
   }
 
   Component.onCompleted: {
-    replacingText.text = qsTr("Загрузка изображений")
-
-    destinationButtonModel.init()
-    proxy.startLoading(folderSet.sourcePath)
+    reloadData()
   }
 
   onVisibilityChanged: if(!visible)

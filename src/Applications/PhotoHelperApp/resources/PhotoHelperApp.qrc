@@ -9,5 +9,6 @@
         <file alias="icons/turn_right">icons/turn_right.png</file>
         <file alias="icons/all_photos">icons/all_photos.png</file>
         <file alias="icons/one_photo">icons/one_photo.png</file>
+        <file alias="icons/settings">icons/settings.png</file>
     </qresource>
 </RCC>

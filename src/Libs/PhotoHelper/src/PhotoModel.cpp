@@ -121,7 +121,7 @@ void PhotoModel::setSelectedIndexes(const QList<int> &indexes)
 void PhotoModel::rotateRight(int index)
 {
   FileOperationHandler::rotateRightImage(m_pathList.at(index));
-  updateData(index);
+  emitUpdateData(index);
 }
 
 void PhotoModel::rotateRightSelectedIndexes()
@@ -157,7 +157,7 @@ QStringList PhotoModel::getDestinationPathNameList()
   return m_destinationPathNameList;
 }
 
-void PhotoModel::updateData(int index)
+void PhotoModel::emitUpdateData(int index)
 {
   QModelIndex ind = createIndex(index, index);
   emit dataChanged(ind, ind);

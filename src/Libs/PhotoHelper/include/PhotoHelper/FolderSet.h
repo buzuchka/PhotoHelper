@@ -49,6 +49,9 @@ public:
   Q_INVOKABLE QStringList getDestinationPathNameListAsList() const;
   Q_INVOKABLE QStringList getDestinationPathListAsList() const;
 
+  //! Удалить все элементы путей назначения
+  Q_INVOKABLE void clearDestinationPathList();
+
 signals:
   void sourceNameChanged();
   void sourcePathChanged();
