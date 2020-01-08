@@ -21,6 +21,9 @@ Item {
                                      photoModel.selectedIndexes[0] :
                                      0
 
+  function updateFocus() {
+  }
+
   function forwardClicked() {
   }
 

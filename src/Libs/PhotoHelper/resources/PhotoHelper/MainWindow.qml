@@ -30,6 +30,10 @@ Window {
     return loader.source.toString().includes("AllPhotoItem.qml")
   }
 
+  function updateFocus() {
+    loader.item.updateFocus()
+  }
+
   function reloadData() {
     replacingText.text = qsTr("Загрузка изображений")
 
@@ -261,6 +265,7 @@ Window {
     folderSet: root.folderSet
     title: root.title
     onSaveButtonClicked: reloadData()
+    onCloseButtonClicked: updateFocus()
   }
 
   Connections {

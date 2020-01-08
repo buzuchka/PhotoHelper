@@ -14,12 +14,16 @@ Item {
 
   property int outsideIndex: -1
 
+  function updateFocus() {
+    photoListView.forceActiveFocus()
+  }
+
   function forwardClicked() {
     if(mainCurrentIndex < elementsCount - 1) {
       mainCurrentIndex++
       photoListView.positionViewAtIndex(mainCurrentIndex, ListView.Beginning)
       updateCurrentNameLabel()
-      photoListView.forceActiveFocus()
+      updateFocus()
     }
   }
 
@@ -28,7 +32,7 @@ Item {
       mainCurrentIndex--
       photoListView.positionViewAtIndex(mainCurrentIndex, ListView.Beginning)
       updateCurrentNameLabel()
-      photoListView.forceActiveFocus()
+      updateFocus()
     }
   }
 
@@ -37,21 +41,21 @@ Item {
           photoModel.getFilePath(mainCurrentIndex),
           path)
     photoModel.emitUpdateData(mainCurrentIndex)
-    photoListView.forceActiveFocus()
+    updateFocus()
   }
 
   function deletePhoto() {
     fileOperationHandler.deleteFile(photoModel.getFilePath(mainCurrentIndex))
     photoModel.deleteItem(mainCurrentIndex)
-    photoListView.forceActiveFocus()
     if(mainCurrentIndex == elementsCount - 1)
       mainCurrentIndex--
     updateCurrentNameLabel()
+    updateFocus()
   }
 
   function rotateRightPhoto() {
     photoModel.rotateRight(mainCurrentIndex)
-    photoListView.forceActiveFocus()
+    updateFocus()
   }
 
   function updateCurrentNameLabel() {
@@ -130,12 +134,11 @@ Item {
     }
   }
   Component.onCompleted: {
-    photoListView.forceActiveFocus()
-
     if(outsideIndex > 0) {
       mainCurrentIndex = outsideIndex
       photoListView.positionViewAtIndex(mainCurrentIndex, ListView.Beginning)
     }
     updateCurrentNameLabel()
+    updateFocus()
   }
 }

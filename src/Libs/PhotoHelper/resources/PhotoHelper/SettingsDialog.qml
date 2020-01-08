@@ -16,6 +16,7 @@ Window {
   property var mainComponent;
 
   signal saveButtonClicked()
+  signal closeButtonClicked()
 
   function saveModel(model, set) {
     set.clearDestinationPathList()
@@ -184,6 +185,9 @@ Window {
       }
     }
   }
+
+  onVisibilityChanged: if(!visibility)
+                         closeButtonClicked()
 
   Component.onCompleted: {
     sourceNameTextField.text = folderSet.getSourceName()
