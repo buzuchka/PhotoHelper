@@ -118,7 +118,8 @@ QStringList FileOperationHandler::getImagesPathList(const QString &path)
 {
   auto nameList = QDir(path).entryList(
         QStringList() << "*.jpg" << "*.jpeg",
-        QDir::Files | QDir::NoSymLinks | QDir::NoDotAndDotDot);
+        QDir::Files | QDir::NoSymLinks | QDir::NoDotAndDotDot,
+        QDir::Time | QDir::Reversed);
 
   for(auto & name : nameList)
     name.prepend(path + QDir::separator());
