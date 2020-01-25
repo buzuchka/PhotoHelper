@@ -75,6 +75,12 @@ public:
   //! Отправляет сигнал об обновлении элемента
   Q_INVOKABLE void emitUpdateData(int index);
 
+  //! Задает индекс элемента, который необходимо загрузить
+  Q_INVOKABLE void setLastOperatedIndex(int index);
+
+  //! Удаляет данные модели
+  Q_INVOKABLE void clear();
+
 private:
   int getOrientation(int index) const;
 
@@ -84,9 +90,15 @@ signals:
   void destinationPathListChanged();
   void destinationPathNameListChanged();
 
+protected:
+  bool canFetchMore(const QModelIndex &parent) const override;
+  void fetchMore(const QModelIndex &parent) override;
+
 private:
   QStringList m_pathList;                ///< Список путей до изображений
   QList<int> m_selectedIndexes;          ///< Индексы выделенных элементов
+  unsigned int m_fetchedItemCount;       ///< Количество загруженных элементов
+  unsigned int m_lastOperatedIndex;
   QStringList m_destinationPathList;     ///< Пути до папок назначения
   QStringList m_destinationPathNameList; ///< Названия папок назначения
   mutable QHash<QString, int> m_orientationCache;

@@ -36,9 +36,11 @@ Window {
 
   function reloadData() {
     replacingText.text = qsTr("Загрузка изображений")
+    photoModel.clear()
 
     destinationButtonModel.init()
 
+    photoModel.setLastOperatedIndex(folderSet.getLastOperatedIndex())
     photoModel.setDestinationPathList(folderSet.getDestinationPathListAsList())
     photoModel.setDestinationPathNameList(folderSet.getDestinationPathNameListAsList())
 
@@ -50,8 +52,6 @@ Window {
 
   PhotoModel {
     id: photoModel
-    destinationPathList: folderSet.getDestinationPathListAsList()
-    destinationPathNameList: folderSet.getDestinationPathNameListAsList()
   }
 
   RowLayout {
