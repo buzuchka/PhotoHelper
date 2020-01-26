@@ -211,6 +211,7 @@ void PhotoModel::fetchMore(const QModelIndex &parent)
   {
     int t = (m_lastOperatedIndex+1) / chunkSize;
     itemsToFetch = chunkSize * (t + 1);
+    m_lastOperatedIndex = 0;
   }
 
   beginInsertRows(QModelIndex(),

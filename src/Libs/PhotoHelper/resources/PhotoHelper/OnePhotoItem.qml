@@ -14,6 +14,8 @@ Item {
 
   property int outsideIndex: -1
 
+  property bool once: true
+
   function updateFocus() {
     photoListView.forceActiveFocus()
   }
@@ -96,7 +98,6 @@ Item {
           height: (model.orientation === 0) || (model.orientation === 2) ?
                    parent.height : parent.width
 
-          cache: false
           fillMode: Image.PreserveAspectFit
           source: "file:" + model.path
 
@@ -130,6 +131,17 @@ Item {
       }
       Keys.onRightPressed: {
         forwardClicked()
+      }
+
+      // Костыль для корректного отображения конкретного элемента при загрузке программы
+      onCountChanged: {
+        if(count > 1) {
+          if(once) {
+            backClicked()
+            forwardClicked()
+            once = false
+          }
+        }
       }
     }
   }
