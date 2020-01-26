@@ -72,7 +72,7 @@ Window {
         icon.color: enabled ? "transparent" : "lightgrey"
         icon.source: "qrc:/icons/one_photo"
 
-        enabled: isCurrentAllPhotoItem()
+        enabled: (elementsCount > 0) && isCurrentAllPhotoItem()
         onClicked: loader.setSource("OnePhotoItem.qml",
                                     {"photoModel": photoModel,
                                      "fileOperationHandler": fileOperationHandler,
@@ -89,7 +89,7 @@ Window {
         icon.color: enabled ? "transparent" : "lightgrey"
         icon.source: "qrc:/icons/all_photos"
 
-        enabled:isCurrentOnePhotoItem()
+        enabled: (elementsCount > 0) && isCurrentOnePhotoItem()
         onClicked: loader.setSource("AllPhotoItem.qml",
                                     {"photoModel": photoModel,
                                      "fileOperationHandler": fileOperationHandler,
