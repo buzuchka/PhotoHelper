@@ -63,6 +63,8 @@ Window {
       Layout.fillHeight: true
       Layout.maximumWidth: buttonWidth
 
+      z: 10 // чтобы нижний текст был поверх фото
+
       Button {
         Layout.preferredWidth: buttonWidth
         Layout.preferredHeight: buttonWidth
@@ -127,11 +129,13 @@ Window {
          Layout.fillHeight: true
       }
 
+      // Имя текущего файла фотографии
       Text {
         visible: elementsCount > 0
         text: loader.item ? loader.item.currentPhotoNameText : ""
       }
 
+      // Текущий индекс / Количество фотографий
       Text {
         visible: elementsCount > 0
         text: loader.item ? loader.item.currentPhotoIndexText : ""
