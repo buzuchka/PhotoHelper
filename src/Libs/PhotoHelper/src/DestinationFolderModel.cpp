@@ -1,7 +1,6 @@
 #include "DestinationFolderModel.h"
 #include "ConfigManager.h"
 
-
 #include <QColor>
 #include <QCryptographicHash>
 

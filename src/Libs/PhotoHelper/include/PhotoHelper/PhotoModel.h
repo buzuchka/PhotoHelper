@@ -4,6 +4,7 @@
 #include <photohelper_export.h>
 
 #include <QAbstractListModel>
+#include <QFileInfo>
 #include <QStringList>
 
 namespace PhotoHelper {
@@ -81,8 +82,13 @@ public:
   //! Удаляет данные модели
   Q_INVOKABLE void clear();
 
+  //! Обновляеь данные после копирования файла
+  Q_INVOKABLE void onFileCopied(int index, QString const& folderPath);
+
 private:
   int getOrientation(int index) const;
+  QStringList getContainsColors(int index) const;
+  void fillDestinationPathFilesCache();
 
 signals:
   void selectedIndexesChanged();
@@ -102,6 +108,10 @@ private:
   QStringList m_destinationPathList;     ///< Пути до папок назначения
   QStringList m_destinationPathNameList; ///< Названия папок назначения
   mutable QHash<QString, int> m_orientationCache;
+  mutable QHash<QString, QStringList> m_containsColorsCache;
+
+  // Список файлов в целевых директориях
+  mutable QHash<QString, QFileInfoList> m_destinationPathFilesCache;
 };
 
 } // !PhotoHelper

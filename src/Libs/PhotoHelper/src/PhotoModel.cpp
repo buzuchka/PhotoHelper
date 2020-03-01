@@ -2,12 +2,17 @@
 
 #include "FileOperationHandler.h"
 
+#include <QColor>
+#include <QDateTime>
 #include <QDir>
 #include <QFileInfo>
+#include <QString>
 
 #include <QDebug>
 
 namespace PhotoHelper {
+
+QColor GetColorByName(const QString& name);
 
 PhotoModel::PhotoModel(QObject *parent)
   : QAbstractListModel(parent)
@@ -35,9 +40,7 @@ QVariant PhotoModel::data(const QModelIndex &index, int role) const
   case OrientationRole:
     return getOrientation(index.row());
   case ContainsRole:
-    return FileOperationHandler::getContainsFolderColors(m_pathList.at(index.row()),
-                                                         m_destinationPathList,
-                                                         m_destinationPathNameList);
+    return getContainsColors(index.row());
   default:
       return QVariant();
   }
@@ -137,6 +140,8 @@ int PhotoModel::elementsCount() const
 void PhotoModel::setDestinationPathList(const QStringList &pathList)
 {
   m_destinationPathList = pathList;
+  fillDestinationPathFilesCache();
+
   emit destinationPathListChanged();
 }
 
@@ -175,6 +180,21 @@ void PhotoModel::clear()
   m_orientationCache.clear();
 }
 
+void PhotoModel::onFileCopied(int index, const QString &folderPath)
+{
+  // Убираем путь для перегенерации
+  m_containsColorsCache.remove(m_pathList.at(index));
+
+  auto files = m_destinationPathFilesCache.value(folderPath);
+  m_destinationPathFilesCache.remove(folderPath);
+  QFileInfo fileInfo(m_pathList.at(index));
+  files.push_back(folderPath + QDir::separator() +
+                  fileInfo.fileName());
+  m_destinationPathFilesCache.insert(folderPath, files);
+
+  emitUpdateData(index);
+}
+
 int PhotoModel::getOrientation(int index)const
 {
   QString filePath(m_pathList.at(index));
@@ -185,6 +205,57 @@ int PhotoModel::getOrientation(int index)const
   int orientation = FileOperationHandler::getImageOrientation(filePath);
   m_orientationCache.insert(filePath, orientation);
   return orientation;
+}
+
+QStringList PhotoModel::getContainsColors(int index) const
+{
+  QString filePath(m_pathList.at(index));
+
+  if(m_containsColorsCache.contains(filePath))
+    return m_containsColorsCache.value(filePath);
+
+  QStringList colorList;
+  QFile file(filePath);
+
+  QFileInfo fileInfo(file);
+  QString fileName = fileInfo.baseName();
+
+  // Получить первые цифры из названия фото, если оно начинается на IMG_
+  if(fileName.startsWith("IMG_"))
+    fileName = fileName.mid(4, 4);
+
+  for(int i = 0; i < m_destinationPathList.count(); ++i)
+  {
+    QFileInfoList destFileInfoList =
+        m_destinationPathFilesCache.value(m_destinationPathList.at(i));
+
+    for(QFileInfo const& destFileInfo : destFileInfoList)
+    {
+      if(destFileInfo.baseName().contains(fileName) &&
+         (destFileInfo.size() == file.size()) &&
+         (destFileInfo.lastModified() == fileInfo.lastModified())) {
+        colorList.append(GetColorByName(m_destinationPathNameList.at(i)).name());
+        break;
+      }
+    }
+  }
+
+  m_containsColorsCache.insert(filePath, colorList);
+  return colorList;
+}
+
+void PhotoModel::fillDestinationPathFilesCache()
+{
+  m_destinationPathFilesCache.clear();
+
+  for(auto const& path : m_destinationPathList) {
+    auto files = QDir(path).entryInfoList(
+    {"*.jpg", "*.jpeg"},
+    QDir::Files |
+    QDir::NoSymLinks |
+    QDir::NoDotAndDotDot);
+    m_destinationPathFilesCache.insert(path, files);
+  }
 }
   
 bool PhotoModel::canFetchMore(const QModelIndex &parent) const

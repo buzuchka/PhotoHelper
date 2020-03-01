@@ -50,10 +50,6 @@ public:
 
   // Поворот нескольких изображений вправо
   Q_INVOKABLE void rotateRightImages(const QStringList &filePathList);
-
-  static QStringList getContainsFolderColors(QString const& filePath,
-                                             QStringList const& dirList,
-                                             QStringList const& nameList);
 };
 
 } // !PhotoHelper

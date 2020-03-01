@@ -42,6 +42,7 @@ Item {
     fileOperationHandler.copyFile(
           photoModel.getFilePath(mainCurrentIndex),
           path)
+    photoModel.onFileCopied(mainCurrentIndex, path);
     photoModel.emitUpdateData(mainCurrentIndex)
     updateFocus()
   }

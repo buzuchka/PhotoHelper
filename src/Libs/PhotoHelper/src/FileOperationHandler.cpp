@@ -195,38 +195,5 @@ int FileOperationHandler::getImageOrientation(const QString &filePath)
 
   return static_cast<int>(orientation);
 }
-QStringList FileOperationHandler::getContainsFolderColors(QString const& filePath,
-                                                          QStringList const& dirList,
-                                                          QStringList const& nameList)
-{
-  QStringList colorList;
-  QFile file(filePath);
-
-  QFileInfo fileInfo(file);
-  QString fileName = fileInfo.baseName();
-
-  // Получить первые цифры из названия фото, если оно начинается на IMG_s
-  if(fileName.startsWith("IMG_"))
-    fileName = fileName.mid(4, 4);
-
-  for(int i = 0; i < dirList.count(); ++i)
-  {
-    QFileInfoList destFileInfoList = QDir(dirList.at(i)).entryInfoList(
-                                                      {"*" + fileName + "*.jpg",
-                                                       "*" + fileName + "*.jpeg"},
-                                                      QDir::Files |
-                                                      QDir::NoSymLinks |
-                                                      QDir::NoDotAndDotDot);
-    for(QFileInfo const& destFileInfo : destFileInfoList)
-    {
-      if((destFileInfo.size() == file.size()) &&
-         (destFileInfo.lastModified() == fileInfo.lastModified())) {
-        colorList.append(GetColorByName(nameList.at(i)).name());
-        break;
-      }
-    }
-  }
-  return colorList;
-}
 
 } // !PhotoHelper

@@ -34,8 +34,10 @@ Item {
     fileOperationHandler.copyFiles(
           photoModel.getFilePathList(photoModel.selectedIndexes),
           path)
-    for(var i = 0; i < photoModel.selectedIndexes.length; ++i)
+    for(var i = 0; i < photoModel.selectedIndexes.length; ++i) {
+      photoModel.onFileCopied(photoModel.selectedIndexes[i], path);
       photoModel.emitUpdateData(photoModel.selectedIndexes[i])
+    }
   }
 
   function deletePhoto() {
@@ -115,6 +117,9 @@ Item {
             // Изображение
             Image {
               id: photo
+
+              asynchronous: true
+              cache: true
 
               anchors.centerIn: parent
 
