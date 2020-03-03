@@ -5,8 +5,11 @@
 
 #include <PhotoHelper/Types.h>
 
+#include <QFileInfo>
 #include <QObject>
 #include <QVariant>
+
+#include <QtQml/QQmlPropertyMap>
 
 namespace PhotoHelper {
 
@@ -46,10 +49,12 @@ public:
   static int getImageOrientation(const QString &path);
 
   // Поворот изображения вправо
-   static void rotateRightImage(const QString &filePath);
+  static void rotateRightImage(const QString &filePath);
 
   // Поворот нескольких изображений вправо
   Q_INVOKABLE void rotateRightImages(const QStringList &filePathList);
+
+  static QQmlPropertyMap* getDestinationPathFilesCache(QStringList const& destinationPathList);
 };
 
 } // !PhotoHelper

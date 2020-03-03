@@ -8,6 +8,8 @@
 #include <QFileInfo>
 #include <QString>
 
+#include <QtQml/QQmlPropertyMap>
+
 #include <QDebug>
 
 namespace PhotoHelper {
@@ -140,8 +142,6 @@ int PhotoModel::elementsCount() const
 void PhotoModel::setDestinationPathList(const QStringList &pathList)
 {
   m_destinationPathList = pathList;
-  fillDestinationPathFilesCache();
-
   emit destinationPathListChanged();
 }
 
@@ -188,11 +188,16 @@ void PhotoModel::onFileCopied(int index, const QString &folderPath)
   auto files = m_destinationPathFilesCache.value(folderPath);
   m_destinationPathFilesCache.remove(folderPath);
   QFileInfo fileInfo(m_pathList.at(index));
-  files.push_back(folderPath + QDir::separator() +
-                  fileInfo.fileName());
+  files.push_back(fileInfo.fileName());
   m_destinationPathFilesCache.insert(folderPath, files);
 
   emitUpdateData(index);
+}
+
+void PhotoModel::setDestinationPathFilesCache(QQmlPropertyMap * cache)
+{
+  for(QString & key : cache->keys())
+    m_destinationPathFilesCache.insert(key, cache->value(key).toStringList());
 }
 
 int PhotoModel::getOrientation(int index)const
@@ -226,11 +231,12 @@ QStringList PhotoModel::getContainsColors(int index) const
 
   for(int i = 0; i < m_destinationPathList.count(); ++i)
   {
-    QFileInfoList destFileInfoList =
+    QStringList destFileInfoList =
         m_destinationPathFilesCache.value(m_destinationPathList.at(i));
 
-    for(QFileInfo const& destFileInfo : destFileInfoList)
+    for(QString const& destFilePath : destFileInfoList)
     {
+      QFileInfo destFileInfo(m_destinationPathList.at(i) + QDir::separator() + destFilePath);
       if(destFileInfo.baseName().contains(fileName) &&
          (destFileInfo.size() == file.size()) &&
          (destFileInfo.lastModified() == fileInfo.lastModified())) {
@@ -244,20 +250,6 @@ QStringList PhotoModel::getContainsColors(int index) const
   return colorList;
 }
 
-void PhotoModel::fillDestinationPathFilesCache()
-{
-  m_destinationPathFilesCache.clear();
-
-  for(auto const& path : m_destinationPathList) {
-    auto files = QDir(path).entryInfoList(
-    {"*.jpg", "*.jpeg"},
-    QDir::Files |
-    QDir::NoSymLinks |
-    QDir::NoDotAndDotDot);
-    m_destinationPathFilesCache.insert(path, files);
-  }
-}
-  
 bool PhotoModel::canFetchMore(const QModelIndex &parent) const
 {
   if (parent.isValid())

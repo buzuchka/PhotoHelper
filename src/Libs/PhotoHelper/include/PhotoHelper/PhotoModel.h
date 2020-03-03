@@ -7,6 +7,8 @@
 #include <QFileInfo>
 #include <QStringList>
 
+class QQmlPropertyMap;
+
 namespace PhotoHelper {
 
 class PHOTOHELPER_EXPORT PhotoModel : public QAbstractListModel
@@ -82,13 +84,14 @@ public:
   //! Удаляет данные модели
   Q_INVOKABLE void clear();
 
-  //! Обновляеь данные после копирования файла
+  //! Обновляет данные после копирования файла
   Q_INVOKABLE void onFileCopied(int index, QString const& folderPath);
+
+  Q_INVOKABLE void setDestinationPathFilesCache(QQmlPropertyMap*);
 
 private:
   int getOrientation(int index) const;
   QStringList getContainsColors(int index) const;
-  void fillDestinationPathFilesCache();
 
 signals:
   void selectedIndexesChanged();
@@ -111,7 +114,7 @@ private:
   mutable QHash<QString, QStringList> m_containsColorsCache;
 
   // Список файлов в целевых директориях
-  mutable QHash<QString, QFileInfoList> m_destinationPathFilesCache;
+  mutable QHash<QString, QStringList> m_destinationPathFilesCache;
 };
 
 } // !PhotoHelper

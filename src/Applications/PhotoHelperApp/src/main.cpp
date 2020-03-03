@@ -41,6 +41,8 @@ int main(int argc, char** argv)
 
   qmlRegisterTypes();
 
+  qRegisterMetaType<QQmlPropertyMap*>("QQmlPropertyMap");
+
   Q_INIT_RESOURCE(PhotoHelper);
 
   auto *configManager = ConfigManager::getInstance();

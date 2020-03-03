@@ -196,4 +196,20 @@ int FileOperationHandler::getImageOrientation(const QString &filePath)
   return static_cast<int>(orientation);
 }
 
+QQmlPropertyMap* FileOperationHandler::getDestinationPathFilesCache(QStringList const& destinationPathList)
+{
+  QQmlPropertyMap *map = new QQmlPropertyMap;
+
+  for(auto const& path : destinationPathList) {
+    auto files = QDir(path).entryList(
+    {"*.jpg", "*.jpeg"},
+    QDir::Files |
+    QDir::NoSymLinks |
+    QDir::NoDotAndDotDot);
+    map->insert(path, files);
+  }
+  return map;
+}
+
+
 } // !PhotoHelper

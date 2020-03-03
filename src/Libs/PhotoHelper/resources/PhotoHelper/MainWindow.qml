@@ -44,7 +44,7 @@ Window {
     photoModel.setDestinationPathList(folderSet.getDestinationPathListAsList())
     photoModel.setDestinationPathNameList(folderSet.getDestinationPathNameListAsList())
 
-    proxy.startLoading(folderSet.sourcePath)
+    proxy.startLoading(folderSet.sourcePath, folderSet.getDestinationPathListAsList())
   }
 
   width: 800
@@ -277,6 +277,7 @@ Window {
     onLoadingFinished: {
       replacingText.text = qsTr("Нет изображений")
       photoModel.setData(proxy.getImagesPathList())
+      photoModel.setDestinationPathFilesCache(proxy.getDestinationPathFilesCache())
 
       if (elementsCount > 0) {
         loader.setSource("OnePhotoItem.qml",

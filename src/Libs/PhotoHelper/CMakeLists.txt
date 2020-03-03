@@ -1,9 +1,10 @@
 project(PhotoHelper)
 
 find_package(Qt5Widgets QUIET)
+find_package(Qt5Qml QUIET)
 
-include_directories(${Qt5Widgets_INCLUDE_DIRS})
-set(QTLIBRARIES ${Qt5Widgets_LIBRARIES})
+include_directories(${Qt5Widgets_INCLUDE_DIRS} ${Qt5Qml_INCLUDE_DIRS})
+set(QTLIBRARIES ${Qt5Widgets_LIBRARIES} ${Qt5Qml_LIBRARIES})
 
 file(GLOB_RECURSE INCLUDE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/include/*.h**")
 file(GLOB_RECURSE HEADER_FILES  "${CMAKE_CURRENT_SOURCE_DIR}/src/*.h**")
