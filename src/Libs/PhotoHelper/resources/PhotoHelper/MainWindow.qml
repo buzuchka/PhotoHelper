@@ -36,6 +36,8 @@ Window {
 
   function reloadData() {
     replacingText.text = qsTr("Загрузка изображений")
+    progressBar.visible = true
+
     photoModel.clear()
 
     destinationButtonModel.init()
@@ -146,19 +148,33 @@ Window {
       Layout.fillWidth: true
       Layout.fillHeight: true
 
-      Text {
-        id: replacingText
-
+      Item {
         Layout.fillWidth: true
         Layout.fillHeight: true
-        Layout.alignment: Qt.AlignCenter
 
         visible: elementsCount == 0
-        color: "gray"
-        font.pointSize: 20
-        textFormat: Text.PlainText
-        horizontalAlignment: Text.AlignHCenter
-        verticalAlignment: Text.AlignVCenter
+
+        Text {
+          id: replacingText
+
+          anchors.centerIn: parent
+
+          color: "gray"
+          font.pointSize: 20
+          textFormat: Text.PlainText
+          horizontalAlignment: Text.AlignHCenter
+          verticalAlignment: Text.AlignVCenter
+        }
+
+        ProgressBar {
+          id: progressBar
+
+          anchors.topMargin: 20
+          anchors.top: replacingText.bottom
+          anchors.horizontalCenter: parent.horizontalCenter
+          indeterminate: true
+
+        }
       }
 
       Loader {
@@ -276,6 +292,8 @@ Window {
     target: proxy
     onLoadingFinished: {
       replacingText.text = qsTr("Нет изображений")
+      progressBar.visible = false
+
       photoModel.setData(proxy.getImagesPathList())
       photoModel.setDestinationPathFilesCache(proxy.getDestinationPathFilesCache())
 
