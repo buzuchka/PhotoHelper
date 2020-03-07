@@ -75,6 +75,8 @@ void PhotoModel::deleteItem(int index)
   beginRemoveRows(QModelIndex(), index, index);
   m_pathList.removeAt(index);
   endRemoveRows();
+
+  emit elementsCountChanged();
 }
 
 void PhotoModel::deleteItems(const QList<int> &indexes)
