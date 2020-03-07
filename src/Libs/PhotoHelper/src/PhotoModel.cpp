@@ -286,6 +286,8 @@ void PhotoModel::fetchMore(const QModelIndex &parent)
   m_fetchedItemCount += itemsToFetch;
 
   endInsertRows();
+
+  emitUpdateData(parent.row());
 }
 
 } // !PhotoHelper
