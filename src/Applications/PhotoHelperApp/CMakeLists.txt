@@ -18,7 +18,7 @@ file(GLOB_RECURSE RC_FILES "${CMAKE_CURRENT_SOURCE_DIR}/resources/*.rc")
 
 qt5_add_resources(QT_RESOURCES "resources/PhotoHelperApp.qrc")
 
-add_executable(${PROJECT_NAME} ${NAME_HEADERS} ${NAME_SOURCES} ${RC_FILES} ${QT_RESOURCES})
+add_executable(${PROJECT_NAME} WIN32 ${NAME_HEADERS} ${NAME_SOURCES} ${RC_FILES} ${QT_RESOURCES})
 
 target_link_libraries(${PROJECT_NAME}
   ${QTLIBRARIES}
