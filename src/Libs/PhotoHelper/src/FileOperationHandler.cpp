@@ -134,16 +134,7 @@ QStringList FileOperationHandler::getImagesOrientationList(const QString &path)
   auto pathList = getImagesPathList(path);
   for(auto &filePath : pathList)
   {
-    Exiv2::Image::AutoPtr image = Exiv2::ImageFactory::open(filePath.toStdWString());
-    assert (image.get() != 0);
-    image->readMetadata();
-    Exiv2::ExifData& ed = image->exifData();
-    if (ed.empty())
-      std::string error = filePath.toStdString() + ": No Exif data found in the file";
-
-    auto orientationExif = ed["Exif.Image.Orientation"].toLong();
-    RightOrientation orientation = orientationByExifNumber(orientationExif);
-    orientationList.push_back(QString::number(orientation));
+    orientationList.push_back(QString::number(getImageOrientation(filePath)));
   }
   return orientationList;
 }
@@ -183,15 +174,23 @@ void FileOperationHandler::rotateRightImages(const QStringList &pathList)
 
 int FileOperationHandler::getImageOrientation(const QString &filePath)
 {
-  Exiv2::Image::AutoPtr image = Exiv2::ImageFactory::open(filePath.toStdWString());
-  assert (image.get() != 0);
-  image->readMetadata();
-  Exiv2::ExifData& ed = image->exifData();
-  if (ed.empty())
-    qDebug() << filePath + ": No Exif data found in the file";
+  RightOrientation orientation = Normal;
+  try
+  {
+    Exiv2::Image::AutoPtr image = Exiv2::ImageFactory::open(filePath.toStdWString());
+    assert (image.get() != 0);
+    image->readMetadata();
+    Exiv2::ExifData& ed = image->exifData();
+    if (ed.empty())
+      qDebug() << filePath + ": No Exif data found in the file";
 
-  auto orientationExif = ed["Exif.Image.Orientation"].toLong();
-  RightOrientation orientation = orientationByExifNumber(orientationExif);
+    auto orientationExif = ed["Exif.Image.Orientation"].toLong();
+    orientation = orientationByExifNumber(orientationExif);
+  }
+  catch(std::exception const& ex)
+  {
+    qDebug() << ex.what();
+  }
 
   return static_cast<int>(orientation);
 }
