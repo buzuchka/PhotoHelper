@@ -242,8 +242,8 @@ Item {
       onCountChanged: {
         if(count > 1) {
           if(once) {
-            backClicked()
             forwardClicked()
+            backClicked()
             once = false
           }
         }

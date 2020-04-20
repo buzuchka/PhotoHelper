@@ -236,9 +236,9 @@ QStringList PhotoModel::getContainsColors(int index) const
     QStringList destFileInfoList =
         m_destinationPathFilesCache.value(m_destinationPathList.at(i));
 
-    for(QString const& destFilePath : destFileInfoList)
+    for(QString const& destFileName : destFileInfoList)
     {
-      QFileInfo destFileInfo(m_destinationPathList.at(i) + QDir::separator() + destFilePath);
+      QFileInfo destFileInfo(m_destinationPathList.at(i) + QDir::separator() + destFileName);
       if(destFileInfo.baseName().contains(fileName) &&
          (destFileInfo.size() == file.size()) &&
          (destFileInfo.lastModified() == fileInfo.lastModified())) {
