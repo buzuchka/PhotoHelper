@@ -67,7 +67,7 @@ Window {
 
       z: 10 // чтобы нижний текст был поверх фото
 
-      Button {
+      CustomButton {
         Layout.preferredWidth: buttonWidth
         Layout.preferredHeight: buttonWidth
 
@@ -84,7 +84,7 @@ Window {
                                     })
       }
 
-      Button {
+      CustomButton {
         Layout.preferredWidth: buttonWidth
         Layout.preferredHeight: buttonWidth
 
@@ -101,7 +101,7 @@ Window {
                                     })
       }
 
-      Button {
+      CustomButton {
         Layout.preferredWidth: buttonWidth
         Layout.preferredHeight: buttonWidth
 
@@ -114,7 +114,7 @@ Window {
         onClicked: loader.item.forwardClicked()
       }
 
-      Button {
+      CustomButton {
         Layout.preferredWidth: buttonWidth
         Layout.preferredHeight: buttonWidth
 
@@ -194,7 +194,7 @@ Window {
       Layout.fillHeight: true
       Layout.maximumWidth: buttonWidth
 
-      Button {
+      CustomButton {
         id: rotateButton
 
         Layout.preferredWidth: buttonWidth
@@ -209,7 +209,7 @@ Window {
         onClicked: loader.item.rotateRightPhoto()
       }
 
-      Button {
+      CustomButton {
         id: deleteButton
 
         Layout.preferredWidth: buttonWidth
@@ -234,37 +234,26 @@ Window {
 
         clip: true
 
-        delegate: Button {
+        delegate: CustomToggleButton {
           implicitWidth: buttonWidth
           implicitHeight: buttonWidth
+
+          checked: true
+          specialColor: model.color
 
           text: model.name
           enabled: elementsCount > 0
           action: Action {
             text: model.name
-            shortcut: "Ctrl+"+(index+1)
           }
           onClicked: loader.item.copyPhoto(model.path)
-
-          Rectangle {
-            anchors.top: parent.top
-            anchors.right: parent.right
-            anchors.topMargin: 10
-            anchors.rightMargin: 5
-
-            width: 15
-            height: width
-
-            border.width: 1
-            color: model.color
-          }
         }
         model: DestinationFolderModel {
           id: destinationButtonModel
         }
       }      
 
-      Button {
+      CustomButton {
         id: settingsButton
 
         Layout.preferredWidth: buttonWidth

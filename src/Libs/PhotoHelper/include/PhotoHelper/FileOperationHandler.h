@@ -45,13 +45,13 @@ public:
   static QStringList getImagesPathList(const QString &path);
   Q_INVOKABLE QStringList getImagesOrientationList(const QString &path);
 
-  // Возвращает ориентацию изоюражения
+  //! Возвращает ориентацию изображения
   static int getImageOrientation(const QString &path);
 
-  // Поворот изображения вправо
+  //! Поворот изображения вправо
   static void rotateRightImage(const QString &filePath);
 
-  // Поворот нескольких изображений вправо
+  //! Поворот нескольких изображений вправо
   Q_INVOKABLE void rotateRightImages(const QStringList &filePathList);
 
   static QQmlPropertyMap* getDestinationPathFilesCache(QStringList const& destinationPathList);
