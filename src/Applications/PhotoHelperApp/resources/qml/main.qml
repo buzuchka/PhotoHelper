@@ -9,7 +9,7 @@ MainWindow {
 
     folderSet: cppFolderSet
     fileOperationHandler: cppFileOperationHandler
-    proxy: cppProxy
+    //proxy: cppProxy
 
     Component.onCompleted: showMaximized()
 }

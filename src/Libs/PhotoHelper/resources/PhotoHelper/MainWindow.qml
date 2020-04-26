@@ -3,19 +3,17 @@ import QtQuick.Controls 2.12
 import QtQuick.Layouts 1.3
 import QtQuick.Window 2.13
 
+import DataLoader 1.0
 import DestinationFolderModel 1.0
 import FileOperationHandler 1.0
 import FolderSet 1.0
 import PhotoModel 1.0
-
-import Proxy 1.0
 
 Window {
   id: root
 
   property FolderSet folderSet
   property FileOperationHandler fileOperationHandler
-  property Proxy proxy
 
   property int buttonWidth: 100
   property int buttonMargin: 50
@@ -46,11 +44,16 @@ Window {
     photoModel.setDestinationPathList(folderSet.getDestinationPathListAsList())
     photoModel.setDestinationPathNameList(folderSet.getDestinationPathNameListAsList())
 
-    proxy.startLoading(folderSet.sourcePath, folderSet.getDestinationPathListAsList())
+    dataLoader.startLoading(folderSet.sourcePath,
+                            folderSet.getDestinationPathListAsList())
   }
 
   width: 800
   height: 800
+
+  DataLoader {
+    id: dataLoader
+  }
 
   PhotoModel {
     id: photoModel
@@ -284,13 +287,13 @@ Window {
   }
 
   Connections {
-    target: proxy
+    target: dataLoader
     onLoadingFinished: {
       replacingText.text = qsTr("Нет изображений")
       progressBar.visible = false
 
-      photoModel.setData(proxy.getImagesPathList())
-      photoModel.setDestinationPathFilesCache(proxy.getDestinationPathFilesCache())
+      photoModel.setData(dataLoader.getSourcePhotoPathList())
+      photoModel.setDestinationPathFilesCache(dataLoader.getDestinationPathPhotosCache())
 
       if (elementsCount > 0) {
         loader.setSource("OnePhotoItem.qml",

@@ -1,8 +1,7 @@
-#include "Proxy.h"
-
 #include <QApplication>
 
 #include <PhotoHelper/ConfigManager.h>
+#include <PhotoHelper/DataLoader.h>
 #include <PhotoHelper/DestinationFolderModel.h>
 #include <PhotoHelper/FileOperationHandler.h>
 #include <PhotoHelper/FolderSet.h>
@@ -27,7 +26,7 @@ void qmlRegisterTypes()
                                         "FileOperationHandler");
   qmlRegisterType<FolderSet>("FolderSet", 1, 0, "FolderSet");
   qmlRegisterType<PhotoModel>("PhotoModel", 1, 0, "PhotoModel");
-  qmlRegisterType<Proxy>("Proxy", 1, 0, "Proxy");
+  qmlRegisterType<DataLoader>("DataLoader", 1, 0, "DataLoader");
 }
 
 int main(int argc, char** argv)
@@ -71,16 +70,12 @@ int main(int argc, char** argv)
     configManager->setLastOperatedIndex(folderSet.getLastOperatedIndex());
   });
 
-  Proxy proxy;
-
   QQmlApplicationEngine engine;
 
   engine.rootContext()->setContextProperty("cppFolderSet",
                                            &folderSet);
   engine.rootContext()->setContextProperty("cppFileOperationHandler",
                                            &operationHandler);
-  engine.rootContext()->setContextProperty("cppProxy",
-                                           &proxy);
 
   engine.load(QUrl("qrc:/main.qml"));
 

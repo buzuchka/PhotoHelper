@@ -60,6 +60,8 @@ Item {
     fileOperationHandler.deletePhotoFromFolder(
           photoModel.getFilePath(mainCurrentIndex),
           folderPath)
+    photoModel.deletePhotoFromFolder(photoModel.getFilePath(mainCurrentIndex),
+                                     folderPath)
     photoModel.emitUpdateData(mainCurrentIndex)
   }
 
