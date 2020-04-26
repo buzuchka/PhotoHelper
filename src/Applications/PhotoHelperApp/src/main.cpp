@@ -14,19 +14,17 @@
 #include <QtQml/QQmlContext>
 #include <QtQml/QQmlApplicationEngine>
 
-#include <QImageReader>
-
 using namespace PhotoHelper;
 
 void qmlRegisterTypes()
 {
+  qmlRegisterType<DataLoader>("DataLoader", 1, 0, "DataLoader");
   qmlRegisterType<DestinationFolderModel>("DestinationFolderModel", 1, 0,
                                           "DestinationFolderModel");
   qmlRegisterType<FileOperationHandler>("FileOperationHandler", 1, 0,
                                         "FileOperationHandler");
   qmlRegisterType<FolderSet>("FolderSet", 1, 0, "FolderSet");
   qmlRegisterType<PhotoModel>("PhotoModel", 1, 0, "PhotoModel");
-  qmlRegisterType<DataLoader>("DataLoader", 1, 0, "DataLoader");
 }
 
 int main(int argc, char** argv)

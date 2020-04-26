@@ -17,7 +17,7 @@ Item {
   property int outsideIndex: -1  // индекс элемента, который необходимо установить текущим выбранным
 
   // Для передачи при переключении между режимами
-  property int mainCurrentIndex1: photoModel.selectedIndexes.length > 0 ?
+  property int mainCurrentIndex: photoModel.selectedIndexes.length > 0 ?
                                      photoModel.selectedIndexes[0] :
                                      0
 

@@ -83,7 +83,7 @@ Window {
         onClicked: loader.setSource("OnePhotoItem.qml",
                                     {"photoModel": photoModel,
                                      "fileOperationHandler": fileOperationHandler,
-                                     "outsideIndex": loader.item.mainCurrentIndex1
+                                     "outsideIndex": loader.item.mainCurrentIndex
                                     })
       }
 
@@ -113,7 +113,8 @@ Window {
         icon.color: enabled ? "transparent" : "lightgrey"
         icon.source: "qrc:/icons/forward"
 
-        enabled: elementsCount > 0
+        enabled: elementsCount > 0 &&
+                 (loader.item ? loader.item.mainCurrentIndex > 0 : true)
         onClicked: loader.item.forwardClicked()
       }
 
@@ -126,7 +127,8 @@ Window {
         icon.color: enabled ? "transparent" : "lightgrey"
         icon.source: "qrc:/icons/back"
 
-        enabled: elementsCount > 0
+        enabled: elementsCount > 0 &&
+                 (loader.item ? loader.item.mainCurrentIndex < elementsCount-1 : true)
         onClicked: loader.item.backClicked()
       }
 
@@ -198,21 +200,6 @@ Window {
       Layout.maximumWidth: buttonWidth
 
       CustomButton {
-        id: rotateButton
-
-        Layout.preferredWidth: buttonWidth
-        Layout.preferredHeight: buttonWidth
-
-        icon.height: buttonWidth
-        icon.width: buttonWidth
-        icon.color: enabled ? "transparent" : "lightgrey"
-        icon.source: "qrc:/icons/turn_right"
-
-        enabled: elementsCount > 0
-        onClicked: loader.item.rotateRightPhoto()
-      }
-
-      CustomButton {
         id: deleteButton
 
         Layout.preferredWidth: buttonWidth
@@ -229,6 +216,21 @@ Window {
           shortcut: StandardKey.Delete
         }
         onClicked: loader.item.deletePhoto()
+      }
+
+      CustomButton {
+        id: rotateButton
+
+        Layout.preferredWidth: buttonWidth
+        Layout.preferredHeight: buttonWidth
+
+        icon.height: buttonWidth
+        icon.width: buttonWidth
+        icon.color: enabled ? "transparent" : "lightgrey"
+        icon.source: "qrc:/icons/turn_right"
+
+        enabled: elementsCount > 0
+        onClicked: loader.item.rotateRightPhoto()
       }
 
       ListView {
