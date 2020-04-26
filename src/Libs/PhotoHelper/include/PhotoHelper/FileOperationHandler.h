@@ -42,6 +42,11 @@ public:
   Q_INVOKABLE void deleteFile(const QString &filePath);
   Q_INVOKABLE void deleteFiles(const QStringList &filePathList);
 
+  Q_INVOKABLE void deletePhotoFromFolder(QString const& photoFilePath,
+                                         QString const& folderPath);
+  Q_INVOKABLE void deletePhotosFromFolder(QStringList const& photoFilePathList,
+                                          QString const& folderPath);
+
   static QStringList getImagesPathList(const QString &path);
   Q_INVOKABLE QStringList getImagesOrientationList(const QString &path);
 

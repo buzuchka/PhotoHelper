@@ -246,7 +246,13 @@ Window {
           action: Action {
             text: model.name
           }
-          onClicked: loader.item.copyPhoto(model.path)
+
+          onCheckedChanged: {
+            if(checked)
+              loader.item.copyPhoto(model.path)
+            else
+              loader.item.deletePhotoFromFolder(model.path)
+          }
         }
         model: DestinationFolderModel {
           id: destinationButtonModel

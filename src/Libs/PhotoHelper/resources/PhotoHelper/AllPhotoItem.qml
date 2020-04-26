@@ -47,6 +47,13 @@ Item {
       photoModel.setSelectedIndexes([])
   }
 
+  function deletePhotoFromFolder() {
+    fileOperationHandler.deletePhotosFromFolder(
+          photoModel.getFilePathList(photoModel.selectedIndexes),
+          folderPath)
+
+  }
+
   function rotateRightPhoto() {
     fileOperationHandler.rotateRightImages(
           photoModel.getFilePathList(photoModel.selectedIndexes))

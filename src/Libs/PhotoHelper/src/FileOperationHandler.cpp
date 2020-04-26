@@ -114,6 +114,29 @@ void FileOperationHandler::deleteFiles(const QStringList &filePathList)
     QFile::remove(filePath);
 }
 
+void FileOperationHandler::deletePhotoFromFolder(const QString &photoFilePath,
+                                                 const QString &folderPath)
+{
+  QFileInfo sourceFileInfo(photoFilePath);
+  auto destPhotoInfoList =
+      QDir(folderPath).entryInfoList({sourceFileInfo.baseName() + "*"});
+
+  for(auto const& destPhotoInfo : destPhotoInfoList)
+  {
+    if(sourceFileInfo.size() == destPhotoInfo.size() &&
+       sourceFileInfo.lastModified() == destPhotoInfo.lastModified())
+      QFile::remove(folderPath + QDir::separator() + destPhotoInfo.fileName());
+  }
+}
+
+void FileOperationHandler::deletePhotosFromFolder(
+    const QStringList &photoFilePathList,
+    const QString &folderPath)
+{
+  for(auto const& photoFilePath : photoFilePathList)
+    deletePhotoFromFolder(photoFilePath, folderPath);
+}
+
 QStringList FileOperationHandler::getImagesPathList(const QString &path)
 {
   auto nameList = QDir(path).entryList(

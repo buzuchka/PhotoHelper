@@ -56,6 +56,13 @@ Item {
     updateFocus()
   }
 
+  function deletePhotoFromFolder(folderPath) {
+    fileOperationHandler.deletePhotoFromFolder(
+          photoModel.getFilePath(mainCurrentIndex),
+          folderPath)
+    photoModel.emitUpdateData(mainCurrentIndex)
+  }
+
   function rotateRightPhoto() {
     photoModel.rotateRight(mainCurrentIndex)
     updateFocus()
