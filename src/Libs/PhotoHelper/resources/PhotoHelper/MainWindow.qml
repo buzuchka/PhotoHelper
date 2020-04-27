@@ -77,31 +77,18 @@ Window {
         icon.height: buttonWidth
         icon.width: buttonWidth
         icon.color: enabled ? "transparent" : "lightgrey"
-        icon.source: "qrc:/icons/one_photo"
+        icon.source: isCurrentOnePhotoItem() ?
+                       "qrc:/icons/all_photos" :
+                       "qrc:/icons/one_photo"
 
-        enabled: (elementsCount > 0) && isCurrentAllPhotoItem()
-        onClicked: loader.setSource("OnePhotoItem.qml",
-                                    {"photoModel": photoModel,
-                                     "fileOperationHandler": fileOperationHandler,
-                                     "outsideIndex": loader.item.mainCurrentIndex
-                                    })
-      }
-
-      CustomButton {
-        Layout.preferredWidth: buttonWidth
-        Layout.preferredHeight: buttonWidth
-
-        icon.height: buttonWidth
-        icon.width: buttonWidth
-        icon.color: enabled ? "transparent" : "lightgrey"
-        icon.source: "qrc:/icons/all_photos"
-
-        enabled: (elementsCount > 0) && isCurrentOnePhotoItem()
-        onClicked: loader.setSource("AllPhotoItem.qml",
-                                    {"photoModel": photoModel,
-                                     "fileOperationHandler": fileOperationHandler,
-                                     "outsideIndex": loader.item.mainCurrentIndex
-                                    })
+        enabled: elementsCount > 0
+        onClicked:
+            if(isCurrentOnePhotoItem())
+              loader.setSource("AllPhotoItem.qml",
+                               {"photoController": photoController})
+            else
+              loader.setSource("OnePhotoItem.qml",
+                               {"photoController": photoController})
       }
 
       CustomButton {
