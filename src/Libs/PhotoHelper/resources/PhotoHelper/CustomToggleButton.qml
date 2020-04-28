@@ -18,7 +18,7 @@ CustomButton {
       anchors.fill: parent
       anchors.margins: 5
       opacity: control.checked ? 0.3 : 0.1
-      color: control.checked ? specialColor : control.hovered ? "#dadce0" : "transparent"
+      color: control.checked ? specialColor : control.hovered ? "#c1c3c7" : "transparent"
     }
   }
 }

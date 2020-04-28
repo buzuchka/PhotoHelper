@@ -5,20 +5,19 @@ import QtQuick.Window 2.13
 
 import DataLoader 1.0
 import DestinationFolderModel 1.0
-import FileOperationHandler 1.0
 import FolderSet 1.0
+import PhotoController 1.0
 import PhotoModel 1.0
 
 Window {
   id: root
 
   property FolderSet folderSet
-  property FileOperationHandler fileOperationHandler
 
   property int buttonWidth: 100
   property int buttonMargin: 50
 
-  property int elementsCount:  photoModel.elementsCount
+  property int elementsCount:  photoController.elementsCount
 
   function isCurrentOnePhotoItem() {
     return loader.source.toString().includes("OnePhotoItem.qml")
@@ -36,13 +35,7 @@ Window {
     replacingText.text = qsTr("Загрузка изображений")
     progressBar.visible = true
 
-    photoModel.clear()
-
-    destinationButtonModel.init()
-
-    photoModel.setLastOperatedIndex(folderSet.getLastOperatedIndex())
-    photoModel.setDestinationPathList(folderSet.getDestinationPathListAsList())
-    photoModel.setDestinationPathNameList(folderSet.getDestinationPathNameListAsList())
+    photoController.onStartReloadData(folderSet)
 
     dataLoader.startLoading(folderSet.sourcePath,
                             folderSet.getDestinationPathListAsList())
@@ -55,8 +48,8 @@ Window {
     id: dataLoader
   }
 
-  PhotoModel {
-    id: photoModel
+  PhotoController {
+    id: photoController
   }
 
   RowLayout {
@@ -101,7 +94,7 @@ Window {
         icon.source: "qrc:/icons/forward"
 
         enabled: elementsCount > 0 &&
-                 (loader.item ? loader.item.mainCurrentIndex > 0 : true)
+                 photoController.currentIndex > 0
         onClicked: loader.item.forwardClicked()
       }
 
@@ -115,7 +108,7 @@ Window {
         icon.source: "qrc:/icons/back"
 
         enabled: elementsCount > 0 &&
-                 (loader.item ? loader.item.mainCurrentIndex < elementsCount-1 : true)
+                 photoController.currentIndex  < elementsCount-1
         onClicked: loader.item.backClicked()
       }
 
@@ -216,7 +209,8 @@ Window {
         icon.color: enabled ? "transparent" : "lightgrey"
         icon.source: "qrc:/icons/turn_right"
 
-        enabled: elementsCount > 0
+        enabled: elementsCount > 0 &&
+                 photoController.isCurrentPhotoOrientationCorrect
         onClicked: loader.item.rotateRightPhoto()
       }
 
@@ -230,7 +224,7 @@ Window {
           implicitWidth: buttonWidth
           implicitHeight: buttonWidth
 
-          checked: true
+          checked: model.contains
           specialColor: model.color
 
           text: model.name
@@ -246,9 +240,7 @@ Window {
               loader.item.deletePhotoFromFolder(model.path)
           }
         }
-        model: DestinationFolderModel {
-          id: destinationButtonModel
-        }
+        model: photoController.getDestinationFolderModel()
       }      
 
       CustomButton {
@@ -281,14 +273,12 @@ Window {
       replacingText.text = qsTr("Нет изображений")
       progressBar.visible = false
 
-      photoModel.setData(dataLoader.getSourcePhotoPathList())
-      photoModel.setDestinationPathFilesCache(dataLoader.getDestinationPathPhotosCache())
+      photoController.onFinishReloadData(dataLoader.getSourcePhotoPathList(),
+                                         dataLoader.getDestinationPathPhotosCache())
 
       if (elementsCount > 0) {
         loader.setSource("OnePhotoItem.qml",
-                         {"photoModel": photoModel,
-                          "fileOperationHandler": fileOperationHandler,
-                          "outsideIndex": folderSet.getLastOperatedIndex()})
+                         {"photoController": photoController})
       }
     }
   }
@@ -297,6 +287,8 @@ Window {
     reloadData()
   }
 
+  // Сохранение индекса фото при закрытии программы
   onVisibilityChanged: if(!visible)
-                         folderSet.setLastOperatedIndex(loader.item.mainCurrentIndex)
+                         folderSet.setLastOperatedIndex(
+                               photoController.currentIndex)
 }

@@ -38,10 +38,6 @@ int exifNumberByOrientation(RightOrientation o)
 }
 
 //==============================================================================
-FileOperationHandler::FileOperationHandler()
-{
-}
-
 void FileOperationHandler::copyFile(const QString &filePath,
                                     const QString &destinationPath,
                                     const QString &destinationFileName)
@@ -114,7 +110,7 @@ void FileOperationHandler::deleteFiles(const QStringList &filePathList)
     QFile::remove(filePath);
 }
 
-void FileOperationHandler::deletePhotoFromFolder(const QString &photoFilePath,
+void FileOperationHandler::deleteFileFromFolder(const QString &photoFilePath,
                                                  const QString &folderPath)
 {
   QFileInfo sourceFileInfo(photoFilePath);
@@ -134,7 +130,7 @@ void FileOperationHandler::deletePhotosFromFolder(
     const QString &folderPath)
 {
   for(auto const& photoFilePath : photoFilePathList)
-    deletePhotoFromFolder(photoFilePath, folderPath);
+    deleteFileFromFolder(photoFilePath, folderPath);
 }
 
 QStringList FileOperationHandler::getImagesPathList(const QString &path)
@@ -197,7 +193,7 @@ void FileOperationHandler::rotateRightImages(const QStringList &pathList)
 
 int FileOperationHandler::getImageOrientation(const QString &filePath)
 {
-  RightOrientation orientation = Normal;
+  RightOrientation orientation = Undefined;
   try
   {
     Exiv2::Image::AutoPtr image = Exiv2::ImageFactory::open(filePath.toStdWString());

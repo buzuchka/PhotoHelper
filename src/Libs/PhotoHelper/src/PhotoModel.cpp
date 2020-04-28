@@ -24,7 +24,7 @@ PhotoModel::PhotoModel(QObject *parent)
 
 int PhotoModel::rowCount(const QModelIndex &parent) const
 {
-  return parent.isValid() ? 0 : m_fetchedItemCount;
+  return parent.isValid() ? 0 : static_cast<int>(m_fetchedItemCount);
 }
 
 QVariant PhotoModel::data(const QModelIndex &index, int role) const
@@ -66,8 +66,6 @@ void PhotoModel::setData(const QStringList &pathList)
   m_pathList = pathList;
   m_fetchedItemCount = 0;
   endResetModel();
-
-  emit elementsCountChanged();
 }
 
 void PhotoModel::deleteItem(int index)
@@ -75,8 +73,6 @@ void PhotoModel::deleteItem(int index)
   beginRemoveRows(QModelIndex(), index, index);
   m_pathList.removeAt(index);
   endRemoveRows();
-
-  emit elementsCountChanged();
 }
 
 void PhotoModel::deleteItems(const QList<int> &indexes)
@@ -124,21 +120,21 @@ void PhotoModel::setSelectedIndexes(const QList<int> &indexes)
   emit selectedIndexesChanged();
 }
 
-void PhotoModel::rotateRight(int index)
-{
-  FileOperationHandler::rotateRightImage(m_pathList.at(index));
-  emitUpdateData(index);
-}
-
 void PhotoModel::rotateRightSelectedIndexes()
 {
-  for(int ind : m_selectedIndexes)
-    rotateRight(ind);
+  //for(int ind : m_selectedIndexes)
+  //  rotateRight(ind);
 }
 
-int PhotoModel::elementsCount() const
+int PhotoModel::getElementsCount() const
 {
   return m_pathList.size();
+}
+
+void PhotoModel::onOrientationChanged(int index)
+{
+  m_orientationCache.remove(m_pathList.at(index));
+  emitUpdateData(index);
 }
 
 void PhotoModel::setDestinationPathList(const QStringList &pathList)
@@ -187,6 +183,17 @@ void PhotoModel::onFileCopied(int index, const QString &folderPath)
   // Убираем путь для перегенерации
   m_containsColorsCache.remove(m_pathList.at(index));
 
+  auto files = m_destinationPathFilesCache.value(folderPath);
+  m_destinationPathFilesCache.remove(folderPath);
+  QFileInfo fileInfo(m_pathList.at(index));
+  files.push_back(fileInfo.fileName());
+  m_destinationPathFilesCache.insert(folderPath, files);
+
+  emitUpdateData(index);
+}
+
+void PhotoModel::deletePhotoFromFolder(int index, const QString &folderPath)
+{
   auto files = m_destinationPathFilesCache.value(folderPath);
   m_destinationPathFilesCache.remove(folderPath);
   QFileInfo fileInfo(m_pathList.at(index));

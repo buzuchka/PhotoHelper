@@ -18,9 +18,6 @@ class PHOTOHELPER_EXPORT PhotoModel : public QAbstractListModel
              READ selectedIndexes
              WRITE setSelectedIndexes
              NOTIFY selectedIndexesChanged)
-  Q_PROPERTY(int elementsCount
-             READ elementsCount
-             NOTIFY elementsCountChanged)
   Q_PROPERTY(QStringList destinationPathList
              READ getDestinationPathList
              WRITE setDestinationPathList
@@ -58,16 +55,16 @@ public:
   //! Возвращает список путей по индексам
   Q_INVOKABLE QStringList getFilePathList(QList<int> const& indexes);
 
+  //! Обновляет данные после копирования файла
+  Q_INVOKABLE void onFileCopied(int index, QString const& folderPath);
+
   //! Возвращает имя файла по индексу
   Q_INVOKABLE QString getFileName(int index);
 
   Q_INVOKABLE QList<int> selectedIndexes() const;
   Q_INVOKABLE void setSelectedIndexes(const QList<int> &list);
 
-  Q_INVOKABLE void rotateRight(int index);
   Q_INVOKABLE void rotateRightSelectedIndexes();
-
-  Q_INVOKABLE int elementsCount() const;
 
   Q_INVOKABLE void setDestinationPathList(QStringList const& pathList);
   Q_INVOKABLE QStringList getDestinationPathList();
@@ -84,18 +81,24 @@ public:
   //! Удаляет данные модели
   Q_INVOKABLE void clear();
 
-  //! Обновляет данные после копирования файла
-  Q_INVOKABLE void onFileCopied(int index, QString const& folderPath);
+
 
   Q_INVOKABLE void setDestinationPathFilesCache(QQmlPropertyMap*);
 
-private:
+  int getElementsCount() const;
+
+  void onOrientationChanged(int index);
+
   int getOrientation(int index) const;
+
+  void deletePhotoFromFolder(int index, QString const& path);
+
+private:
+
   QStringList getContainsColors(int index) const;
 
 signals:
   void selectedIndexesChanged();
-  void elementsCountChanged();
   void destinationPathListChanged();
   void destinationPathNameListChanged();
 
@@ -108,13 +111,15 @@ private:
   QList<int> m_selectedIndexes;          ///< Индексы выделенных элементов
   unsigned int m_fetchedItemCount;       ///< Количество загруженных элементов
   unsigned int m_lastOperatedIndex;
+
   QStringList m_destinationPathList;     ///< Пути до папок назначения
   QStringList m_destinationPathNameList; ///< Названия папок назначения
-  mutable QHash<QString, int> m_orientationCache;
-  mutable QHash<QString, QStringList> m_containsColorsCache;
 
+  mutable QHash<QString, QStringList> m_containsColorsCache;
   // Список файлов в целевых директориях
   mutable QHash<QString, QStringList> m_destinationPathFilesCache;
+  // Кэш ориентаций изображений
+  mutable QHash<QString /*photoPath*/, int /*orientation*/> m_orientationCache;
 };
 
 } // !PhotoHelper

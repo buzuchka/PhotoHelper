@@ -4,8 +4,7 @@ import QtQuick.Layouts 1.13
 Item {
   id: root
 
-  property var photoModel
-  property var fileOperationHandler
+  property var photoController
 
   property string currentPhotoIndexText: elementsCount + " " + qsTr("фото")
   property string currentPhotoNameText: ""
