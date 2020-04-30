@@ -27,7 +27,7 @@ int PhotoModel::rowCount(const QModelIndex &parent) const
 
 QVariant PhotoModel::data(const QModelIndex &index, int role) const
 {
-  if (!index.isValid())
+  if (!index.isValid() || index.row() >= m_pathList.count())
       return QVariant();
 
   switch (role) {
@@ -188,7 +188,7 @@ void PhotoModel::clear()
 
 int PhotoModel::getOrientation(int index)const
 {
-  if(m_pathList.isEmpty())
+  if(m_pathList.isEmpty() || index >= m_pathList.count())
     return 0;
 
   QString filePath(m_pathList.at(index));
@@ -203,12 +203,15 @@ int PhotoModel::getOrientation(int index)const
 
 QStringList PhotoModel::getContainsColors(int index) const
 {
+  QStringList colorList;
+
+  if(index >= m_pathList.count())
+    return colorList;
+
   QString filePath(m_pathList.at(index));
 
   if(m_containsColorsCache.contains(filePath))
     return m_containsColorsCache.value(filePath);
-
-  QStringList colorList;
 
   for(int i = 0; i < m_folderPathColorCache.count(); ++i)
   {
