@@ -10,6 +10,8 @@ Item {
                                          elementsCount + " " + qsTr("фото")
   property string currentPhotoNameText: photoController.currentPhotoName
 
+  property bool once: true
+
   function updateFocus() {
     photoListView.forceActiveFocus()
   }
@@ -225,6 +227,17 @@ Item {
       }
       Keys.onRightPressed: {
         forwardClicked()
+      }
+
+      // Костыль для корректного отображения конкретного элемента при загрузке программы
+      onCountChanged: {
+        if(count > 1) {
+          if(once) {
+            forwardClicked()
+            backClicked()
+            once = false
+          }
+        }
       }
     }
   }
