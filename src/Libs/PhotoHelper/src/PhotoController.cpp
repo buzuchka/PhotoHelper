@@ -5,7 +5,11 @@
 #include <PhotoHelper/FolderSet.h>
 #include <PhotoHelper/PhotoModel.h>
 
+#include <QColor>
+
 namespace PhotoHelper {
+
+QColor GetColorByName(const QString& name);
 
 PhotoController::PhotoController(QObject *parent)
   : QObject(parent)
@@ -18,7 +22,7 @@ PhotoController::PhotoController(QObject *parent)
   connect(this, &PhotoController::currentIndexChanged,
           this, &PhotoController::isCurrentPhotoOrientationCorrectChanged);
   connect(this, &PhotoController::currentIndexChanged,
-          this, &PhotoController::isFolderContainsCurrentPhotoChanged);
+          this, &PhotoController::updateDestinationFolderModelContainsState);
 }
 
 PhotoModel *PhotoController::getPhotoModel()
@@ -38,10 +42,21 @@ int PhotoController::getElementsCount() const
 
 void PhotoController::onStartReloadData(FolderSet *folderSet)
 {
+  auto folderPathList = folderSet->getDestinationPathListAsList();
+  auto folderNameList = folderSet->getDestinationPathNameListAsList();
+
+  QList<QPair<QString /*folderPath*/, QString /*color*/>> folderPathColorCache;
+
+  for(int i = 0; i < folderPathList.count(); ++i)
+    folderPathColorCache.push_back({folderPathList.at(i),
+                                    GetColorByName(folderNameList.at(i)).name()});
+
   m_photoModel->clear();
   m_photoModel->setLastOperatedIndex(folderSet->getLastOperatedIndex());
-  m_photoModel->setDestinationPathList(folderSet->getDestinationPathListAsList());
-  m_photoModel->setDestinationPathNameList(folderSet->getDestinationPathNameListAsList());
+  m_photoModel->setFolderPathColorCache(folderPathColorCache);
+
+  m_currentIndex = folderSet->getLastOperatedIndex();
+  emit currentIndexChanged();
 
   m_destinationFolderModel->init();
 }
@@ -49,8 +64,10 @@ void PhotoController::onStartReloadData(FolderSet *folderSet)
 void PhotoController::onFinishReloadData(const QStringList &sourcePhotoPathList,
                                          QQmlPropertyMap *destinationPathPhotosCache)
 {
-  m_photoModel->setData(sourcePhotoPathList);
   m_photoModel->setDestinationPathFilesCache(destinationPathPhotosCache);
+  m_photoModel->setData(sourcePhotoPathList);
+
+  updateDestinationFolderModelContainsState();
 
   emit elementsCountChanged();
 }
@@ -79,8 +96,14 @@ QString PhotoController::getCurrentPhotoName() const
 
 void PhotoController::copyCurrentPhoto(const QString &path)
 {
-  FileOperationHandler::copyFile(m_photoModel->getFilePath(m_currentIndex), path);
-  m_photoModel->onFileCopied(m_currentIndex, path);
+  QString copiedPhotoName = FileOperationHandler::copyFile(
+        m_photoModel->getFilePath(m_currentIndex), path);
+
+  if(copiedPhotoName.isEmpty())
+    return;
+
+  m_photoModel->onPhotoCopied(m_currentIndex, path, copiedPhotoName);
+  updateDestinationFolderModelContainsState();
 }
 
 void PhotoController::deleteCurrentPhotoFromSource()
@@ -94,8 +117,10 @@ void PhotoController::deleteCurrentPhotoFromSource()
 
 void PhotoController::deleteCurrentPhotoFromDestination(QString const& path)
 {
-  FileOperationHandler::deleteFileFromFolder(getCurrentPhotoPath(), path);
-  m_photoModel->deletePhotoFromFolder(m_currentIndex, path);
+  QString currentPhotoPath = getCurrentPhotoPath();
+  FileOperationHandler::deleteFileFromFolder(currentPhotoPath, path);
+  m_photoModel->onPhotoDeletedFromDestination(m_currentIndex, path);
+  updateDestinationFolderModelContainsState();
 }
 
 void PhotoController::rotateCurrentPhotoRight()
@@ -109,16 +134,15 @@ bool PhotoController::isCurrentPhotoOrientationCorrect() const
   return m_photoModel->getOrientation(m_currentIndex) < RightOrientation::Undefined;
 }
 
-QList<bool> PhotoController::isFolderContainsCurrentPhoto() const
-{
-  QList<bool> l;
-  l << false;
-  return l;
-}
-
 QString PhotoController::getCurrentPhotoPath() const
 {
   return m_photoModel->getFilePath(m_currentIndex);
+}
+
+void PhotoController::updateDestinationFolderModelContainsState()
+{
+  QList<bool> states = m_photoModel->getContainsState(m_currentIndex);
+  m_destinationFolderModel->setContainsCurrentPhotoList(states);
 }
 
 }

@@ -19,8 +19,17 @@ public:
     {
       NameRole = Qt::UserRole + 1,
       ColorRole,
-      PathRole
+      PathRole,
+      ContainsRole
     };
+
+    enum State
+    {
+      Checked,
+      Unchecked,
+      Undefined
+    };
+    Q_ENUM(State)
 
     DestinationFolderModel(QObject *parent = nullptr);
 
@@ -28,12 +37,15 @@ public:
     virtual QVariant data(const QModelIndex &index, int role) const;
     virtual QHash<int, QByteArray> roleNames() const;
 
-    Q_INVOKABLE void init();
+    void init();
 
     void setFolderData(const FolderConfigList &destinationPathList);
 
+    void setContainsCurrentPhotoList(QList<bool> containsCurrentPhotoList);
+
 private:
     FolderConfigList m_data;
+    QList<bool> m_containsCurrentPhotoList;
 };
 
 } // !PhotoHelper

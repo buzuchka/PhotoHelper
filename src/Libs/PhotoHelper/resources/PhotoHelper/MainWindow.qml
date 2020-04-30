@@ -94,7 +94,8 @@ Window {
         icon.source: "qrc:/icons/forward"
 
         enabled: elementsCount > 0 &&
-                 photoController.currentIndex > 0
+                 photoController.currentIndex >= 0 &&
+                 photoController.currentIndex  < elementsCount-1
         onClicked: loader.item.forwardClicked()
       }
 
@@ -108,7 +109,7 @@ Window {
         icon.source: "qrc:/icons/back"
 
         enabled: elementsCount > 0 &&
-                 photoController.currentIndex  < elementsCount-1
+                 photoController.currentIndex > 0
         onClicked: loader.item.backClicked()
       }
 
@@ -218,13 +219,14 @@ Window {
         Layout.fillWidth: true
         Layout.fillHeight: true
 
+        spacing: 3
         clip: true
 
         delegate: CustomToggleButton {
           implicitWidth: buttonWidth
           implicitHeight: buttonWidth
 
-          checked: model.contains
+          isActive: model.contains
           specialColor: model.color
 
           text: model.name
@@ -233,11 +235,12 @@ Window {
             text: model.name
           }
 
-          onCheckedChanged: {
-            if(checked)
+          onClicked: {
+            if(!isActive)
               loader.item.copyPhoto(model.path)
             else
               loader.item.deletePhotoFromFolder(model.path)
+            isActive = !isActive
           }
         }
         model: photoController.getDestinationFolderModel()

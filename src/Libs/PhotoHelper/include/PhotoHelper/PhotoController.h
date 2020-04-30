@@ -1,6 +1,8 @@
 #ifndef PHOTOHELPER_PHOTOCONTROLLER_H
 #define PHOTOHELPER_PHOTOCONTROLLER_H
 
+#include <QHash>
+#include <QMap>
 #include <QObject>
 
 class QQmlPropertyMap;
@@ -26,9 +28,6 @@ class PhotoController : public QObject
   Q_PROPERTY(bool isCurrentPhotoOrientationCorrect
              READ isCurrentPhotoOrientationCorrect
              NOTIFY isCurrentPhotoOrientationCorrectChanged)
-  Q_PROPERTY(QList<bool> isFolderContainsCurrentPhoto
-             READ isFolderContainsCurrentPhoto
-             NOTIFY isFolderContainsCurrentPhotoChanged)
 public:
   PhotoController(QObject * parent = nullptr);
 
@@ -74,11 +73,17 @@ signals:
   void currentIndexChanged();
   void currentPhotoNameChanged();
   void isCurrentPhotoOrientationCorrectChanged();
-  void isFolderContainsCurrentPhotoChanged();
 
 private:
   //! Возвращает путь до текущего фото
   QString getCurrentPhotoPath() const;
+
+  //! Возвращает список цветов, соответствующих каталогов, в которых содержится
+  //! текущее фото
+  QStringList getCurrentContainsColors() const;
+
+  //! Обновляет состояние модели папок назначения
+  void updateDestinationFolderModelContainsState();
 
 private:
   PhotoModel * m_photoModel;

@@ -31,9 +31,9 @@ public:
   //! filePath - путь до файла, который копируем
   //! destinationPath - путь назначения
   //! destinationFileName - имя файла назначения с расширением
-  static void copyFile(const QString &filePath,
-                       const QString &destinationPath,
-                       const QString &destinationFileName = QString());
+  static QString copyFile(const QString &filePath,
+                          const QString &destinationPath,
+                          const QString &destinationFileName = QString());
 
   void copyFiles(const QStringList &filePathList,
                              const QString &destinationPath);
@@ -57,6 +57,14 @@ public:
 
   //! Поворот нескольких изображений вправо
   void rotateRightImages(const QStringList &filePathList);
+
+  //! Проверяет, что файл содержится в папке
+  //! folderPath - путь до папки
+  //! filePath - путь до файла
+  //! fileName - имя файла в целевой директории
+  static bool isFolderContainsFile(QString const& folderPath,
+                                   QString const& filePath,
+                                   QString &fileName);
 
 private:
   FileOperationHandler() = delete;

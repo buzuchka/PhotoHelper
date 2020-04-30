@@ -5,8 +5,7 @@ CustomButton {
   id: control
 
   property color specialColor: "#d91c26"
-
-  checkable: true
+  property bool isActive: false
 
   background: Rectangle {
     anchors.fill: parent
@@ -17,8 +16,8 @@ CustomButton {
     Rectangle {
       anchors.fill: parent
       anchors.margins: 5
-      opacity: control.checked ? 0.3 : 0.1
-      color: control.checked ? specialColor : control.hovered ? "#c1c3c7" : "transparent"
+      opacity: control.isActive ? 0.3 : 0.1
+      color: control.isActive ? specialColor : control.hovered ? "#c1c3c7" : "transparent"
     }
   }
 }

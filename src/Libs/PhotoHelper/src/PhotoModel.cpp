@@ -14,8 +14,6 @@
 
 namespace PhotoHelper {
 
-QColor GetColorByName(const QString& name);
-
 PhotoModel::PhotoModel(QObject *parent)
   : QAbstractListModel(parent)
   , m_fetchedItemCount(0)
@@ -75,13 +73,54 @@ void PhotoModel::deleteItem(int index)
   endRemoveRows();
 }
 
-void PhotoModel::deleteItems(const QList<int> &indexes)
+void PhotoModel::onPhotoCopied(int index,
+                               const QString &path,
+                               QString const& copiedPhotoName)
 {
-  QList<int> sortedList = indexes;
-  std::sort(sortedList.begin(), sortedList.end());
+  auto files = m_destinationPathFilesCache.value(path);
+  files.push_back(copiedPhotoName);
 
-  for(int i = sortedList.count() - 1; i >= 0; --i)
-    deleteItem(sortedList.at(i));
+  m_destinationPathFilesCache.remove(path);
+  m_destinationPathFilesCache.insert(path, files);
+
+  m_containsColorsCache.remove(m_pathList.at(index));
+
+  emitUpdateData(index);
+}
+
+void PhotoModel::onPhotoDeletedFromDestination(int index,
+                                               const QString &path)
+{
+//  auto files = m_destinationPathFilesCache.value(path);
+//  files.removeOne();
+//
+//  m_destinationPathFilesCache.remove(path);
+//  m_destinationPathFilesCache.insert(path, files);
+
+  emitUpdateData(index);
+}
+
+QList<bool> PhotoModel::getContainsState(int index)
+{
+  QList<bool> states;
+
+  if(m_pathList.empty()) {
+    for(int i = 0; i < m_folderPathColorCache.count(); ++i)
+      states.push_back(false);
+    return states;
+  }
+
+  for(int i = 0; i < m_folderPathColorCache.count(); ++i)
+  {
+    QString tmp;
+    if(FileOperationHandler::isFolderContainsFile(m_folderPathColorCache.at(i).first,
+                                                  m_pathList.at(index),
+                                                  tmp))
+      states.push_back(true);
+    else
+      states.push_back(false);
+  }
+  return states;
 }
 
 QString PhotoModel::getFilePath(int index)
@@ -90,14 +129,6 @@ QString PhotoModel::getFilePath(int index)
     return QString();
 
   return m_pathList.at(index);
-}
-
-QStringList PhotoModel::getFilePathList(const QList<int> &indexes)
-{
-  QStringList list;
-  for(int i = 0; i < indexes.count(); ++i)
-    list.append(m_pathList.at(indexes.at(i)));
-  return list;
 }
 
 QString PhotoModel::getFileName(int index)
@@ -120,12 +151,6 @@ void PhotoModel::setSelectedIndexes(const QList<int> &indexes)
   emit selectedIndexesChanged();
 }
 
-void PhotoModel::rotateRightSelectedIndexes()
-{
-  //for(int ind : m_selectedIndexes)
-  //  rotateRight(ind);
-}
-
 int PhotoModel::getElementsCount() const
 {
   return m_pathList.size();
@@ -135,28 +160,6 @@ void PhotoModel::onOrientationChanged(int index)
 {
   m_orientationCache.remove(m_pathList.at(index));
   emitUpdateData(index);
-}
-
-void PhotoModel::setDestinationPathList(const QStringList &pathList)
-{
-  m_destinationPathList = pathList;
-  emit destinationPathListChanged();
-}
-
-QStringList PhotoModel::getDestinationPathList()
-{
-  return m_destinationPathList;
-}
-
-void PhotoModel::setDestinationPathNameList(const QStringList &nameList)
-{
-  m_destinationPathNameList = nameList;
-  emit destinationPathNameListChanged();
-}
-
-QStringList PhotoModel::getDestinationPathNameList()
-{
-  return m_destinationPathNameList;
 }
 
 void PhotoModel::emitUpdateData(int index)
@@ -170,6 +173,11 @@ void PhotoModel::setLastOperatedIndex(int index)
   m_lastOperatedIndex = index;
 }
 
+void PhotoModel::setFolderPathColorCache(const QList<QPair<QString, QString>> &map)
+{
+  m_folderPathColorCache = map;
+}
+
 void PhotoModel::clear()
 {
   setData({});
@@ -178,39 +186,11 @@ void PhotoModel::clear()
   m_orientationCache.clear();
 }
 
-void PhotoModel::onFileCopied(int index, const QString &folderPath)
-{
-  // Убираем путь для перегенерации
-  m_containsColorsCache.remove(m_pathList.at(index));
-
-  auto files = m_destinationPathFilesCache.value(folderPath);
-  m_destinationPathFilesCache.remove(folderPath);
-  QFileInfo fileInfo(m_pathList.at(index));
-  files.push_back(fileInfo.fileName());
-  m_destinationPathFilesCache.insert(folderPath, files);
-
-  emitUpdateData(index);
-}
-
-void PhotoModel::deletePhotoFromFolder(int index, const QString &folderPath)
-{
-  auto files = m_destinationPathFilesCache.value(folderPath);
-  m_destinationPathFilesCache.remove(folderPath);
-  QFileInfo fileInfo(m_pathList.at(index));
-  files.push_back(fileInfo.fileName());
-  m_destinationPathFilesCache.insert(folderPath, files);
-
-  emitUpdateData(index);
-}
-
-void PhotoModel::setDestinationPathFilesCache(QQmlPropertyMap * cache)
-{
-  for(QString & key : cache->keys())
-    m_destinationPathFilesCache.insert(key, cache->value(key).toStringList());
-}
-
 int PhotoModel::getOrientation(int index)const
 {
+  if(m_pathList.isEmpty())
+    return 0;
+
   QString filePath(m_pathList.at(index));
 
   if(m_orientationCache.contains(filePath))
@@ -229,34 +209,22 @@ QStringList PhotoModel::getContainsColors(int index) const
     return m_containsColorsCache.value(filePath);
 
   QStringList colorList;
-  QFile file(filePath);
 
-  QFileInfo fileInfo(file);
-  QString fileName = fileInfo.baseName();
-
-  // Получить первые цифры из названия фото, если оно начинается на IMG_
-  if(fileName.startsWith("IMG_"))
-    fileName = fileName.mid(4, 4);
-
-  for(int i = 0; i < m_destinationPathList.count(); ++i)
+  for(int i = 0; i < m_folderPathColorCache.count(); ++i)
   {
-    QStringList destFileInfoList =
-        m_destinationPathFilesCache.value(m_destinationPathList.at(i));
-
-    for(QString const& destFileName : destFileInfoList)
-    {
-      QFileInfo destFileInfo(m_destinationPathList.at(i) + QDir::separator() + destFileName);
-      if(destFileInfo.baseName().contains(fileName) &&
-         (destFileInfo.size() == file.size()) &&
-         (destFileInfo.lastModified() == fileInfo.lastModified())) {
-        colorList.append(GetColorByName(m_destinationPathNameList.at(i)).name());
-        break;
-      }
-    }
+    QString tmp;
+    if(FileOperationHandler::isFolderContainsFile(m_folderPathColorCache.at(i).first,
+                                                  filePath,
+                                                  tmp))
+      colorList.push_back(m_folderPathColorCache.at(i).second);
   }
-
-  m_containsColorsCache.insert(filePath, colorList);
   return colorList;
+}
+
+void PhotoModel::setDestinationPathFilesCache(QQmlPropertyMap * cache)
+{
+  for(QString & key : cache->keys())
+    m_destinationPathFilesCache.insert(key, cache->value(key).toStringList());
 }
 
 bool PhotoModel::canFetchMore(const QModelIndex &parent) const

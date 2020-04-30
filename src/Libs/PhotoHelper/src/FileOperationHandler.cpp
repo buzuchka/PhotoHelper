@@ -11,8 +11,6 @@
 
 namespace PhotoHelper {
 
-QColor GetColorByName(const QString& name);
-
 std::unordered_map<int, RightOrientation> exifOrientationMap = {
   {1, RightOrientation::Normal},
   {6, RightOrientation::Right},
@@ -38,9 +36,9 @@ int exifNumberByOrientation(RightOrientation o)
 }
 
 //==============================================================================
-void FileOperationHandler::copyFile(const QString &filePath,
-                                    const QString &destinationPath,
-                                    const QString &destinationFileName)
+QString FileOperationHandler::copyFile(const QString &filePath,
+                                       const QString &destinationPath,
+                                       const QString &destinationFileName)
 {
   QFileInfo fromFileInfo(filePath);
 
@@ -57,7 +55,7 @@ void FileOperationHandler::copyFile(const QString &filePath,
     // Если это один и тот же файл, выходим
     if((fromFileInfo.size() == toFileInfo.size()) &&
        (fromFileInfo.lastModified() == toFileInfo.lastModified()))
-      return;
+      return QString();
     else
     {
       // Если это разные файлы, но с одинаковыми именами, меняем имя назначения
@@ -72,24 +70,23 @@ void FileOperationHandler::copyFile(const QString &filePath,
         {
           i = mas.toInt();
 
-          copyFile(filePath, destinationPath +
-                   QDir::separator(),
-                   (oldFileName.replace(start, mas.size(), QString::number(++i)) +
-                    "." +
-                    fromFileInfo.suffix()));
-          return;
+          return copyFile(filePath, destinationPath +
+                          QDir::separator(),
+                          (oldFileName.replace(start, mas.size(), QString::number(++i)) +
+                           "." +
+                           fromFileInfo.suffix()));
         }
       }
       else {
-        copyFile(filePath,
-                 destinationPath,
-                 (oldFileName + " (2)." + toFileInfo.suffix()));
-        return;
+        return copyFile(filePath,
+                        destinationPath,
+                        (oldFileName + " (2)." + toFileInfo.suffix()));
       }
     }
   }
 
   QFile::copy(filePath, toFilePath);
+  return QFileInfo(toFilePath).fileName();
 }
 
 void FileOperationHandler::copyFiles(const QStringList &filePathList,
@@ -111,18 +108,13 @@ void FileOperationHandler::deleteFiles(const QStringList &filePathList)
 }
 
 void FileOperationHandler::deleteFileFromFolder(const QString &photoFilePath,
-                                                 const QString &folderPath)
+                                                const QString &folderPath)
 {
-  QFileInfo sourceFileInfo(photoFilePath);
-  auto destPhotoInfoList =
-      QDir(folderPath).entryInfoList({sourceFileInfo.baseName() + "*"});
-
-  for(auto const& destPhotoInfo : destPhotoInfoList)
-  {
-    if(sourceFileInfo.size() == destPhotoInfo.size() &&
-       sourceFileInfo.lastModified() == destPhotoInfo.lastModified())
-      QFile::remove(folderPath + QDir::separator() + destPhotoInfo.fileName());
-  }
+  QString destFileName;
+  if(FileOperationHandler::isFolderContainsFile(folderPath,
+                                                photoFilePath,
+                                                destFileName))
+    QFile::remove(folderPath + QDir::separator() + destFileName);
 }
 
 void FileOperationHandler::deletePhotosFromFolder(
@@ -229,5 +221,30 @@ QQmlPropertyMap* FileOperationHandler::getDestinationPathFilesCache(QStringList 
   return map;
 }
 
+bool FileOperationHandler::isFolderContainsFile(QString const& folderPath,
+                                                QString const& filePath,
+                                                QString &fileName)
+{
+  QFileInfo sourceFileInfo(filePath);
+  QString sourceFileName = sourceFileInfo.baseName();
+
+  // Получить первые цифры из названия фото, если оно начинается на IMG_
+  if(sourceFileName.startsWith("IMG_"))
+    sourceFileName = sourceFileName.mid(4, 4);
+
+  auto destPhotoInfoList =
+      QDir(folderPath).entryInfoList({"*" + sourceFileName + "*"});
+
+  for(auto const& destPhotoInfo : destPhotoInfoList)
+  {
+    if(sourceFileInfo.size() == destPhotoInfo.size() &&
+       sourceFileInfo.lastModified() == destPhotoInfo.lastModified())
+    {
+      fileName = destPhotoInfo.fileName();
+      return true;
+    }
+  }
+  return false;
+}
 
 } // !PhotoHelper

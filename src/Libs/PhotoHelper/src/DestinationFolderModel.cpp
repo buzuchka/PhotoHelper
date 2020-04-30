@@ -44,6 +44,9 @@ QVariant DestinationFolderModel::data(const QModelIndex &index, int role) const
     return GetColorByName(m_data.at(index.row()).first);
   case PathRole:
       return m_data.at(index.row()).second;
+  case ContainsRole:
+    if(m_containsCurrentPhotoList.count() > 0)
+      return m_containsCurrentPhotoList.at(index.row());
   default:
       return QVariant();
   }
@@ -55,6 +58,7 @@ QHash<int, QByteArray> DestinationFolderModel::roleNames() const
   roles[NameRole] = "name";
   roles[ColorRole] = "color";
   roles[PathRole] = "path";
+  roles[ContainsRole] = "contains";
   return roles;
 }
 
@@ -68,6 +72,16 @@ void DestinationFolderModel::setFolderData(const FolderConfigList &destinationPa
 {
   beginResetModel();
   m_data = destinationPathList;
+  for(int i = 0; i < m_data.count(); ++i)
+    m_containsCurrentPhotoList.append(false);
+  endResetModel();
+}
+
+void DestinationFolderModel::setContainsCurrentPhotoList(
+    QList<bool> containsCurrentPhotoList)
+{
+  beginResetModel();
+  m_containsCurrentPhotoList = containsCurrentPhotoList;
   endResetModel();
 }
 
