@@ -1,8 +1,21 @@
 #include "DestinationFolderModel.h"
-
 #include "ConfigManager.h"
 
+#include <QColor>
+#include <QCryptographicHash>
+
 namespace PhotoHelper {
+
+QColor GetColorByName(const QString& name)
+{
+  QColor color;
+  QCryptographicHash hash(QCryptographicHash::Md5);
+  hash.addData(name.toUtf8());
+  const auto& hashStr = hash.result().toHex();
+  QString colorStr = QString("#") + hashStr.left(6);
+  color.setNamedColor(colorStr);
+  return color;
+}
 
 DestinationFolderModel::DestinationFolderModel(QObject *parent)
   : QAbstractListModel(parent)
@@ -27,6 +40,8 @@ QVariant DestinationFolderModel::data(const QModelIndex &index, int role) const
   switch (role) {
   case NameRole:
       return m_data.at(index.row()).first;
+  case ColorRole:
+    return GetColorByName(m_data.at(index.row()).first);
   case PathRole:
       return m_data.at(index.row()).second;
   default:
@@ -38,6 +53,7 @@ QHash<int, QByteArray> DestinationFolderModel::roleNames() const
 {
   QHash<int, QByteArray> roles = QAbstractListModel::roleNames();
   roles[NameRole] = "name";
+  roles[ColorRole] = "color";
   roles[PathRole] = "path";
   return roles;
 }

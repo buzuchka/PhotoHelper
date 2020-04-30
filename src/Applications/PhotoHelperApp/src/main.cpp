@@ -1,3 +1,5 @@
+#include "Proxy.h"
+
 #include <QApplication>
 
 #include <PhotoHelper/ConfigManager.h>
@@ -25,6 +27,7 @@ void qmlRegisterTypes()
                                         "FileOperationHandler");
   qmlRegisterType<FolderSet>("FolderSet", 1, 0, "FolderSet");
   qmlRegisterType<PhotoModel>("PhotoModel", 1, 0, "PhotoModel");
+  qmlRegisterType<Proxy>("Proxy", 1, 0, "Proxy");
 }
 
 int main(int argc, char** argv)
@@ -38,6 +41,8 @@ int main(int argc, char** argv)
 
   qmlRegisterTypes();
 
+  qRegisterMetaType<QQmlPropertyMap*>("QQmlPropertyMap");
+
   Q_INIT_RESOURCE(PhotoHelper);
 
   auto *configManager = ConfigManager::getInstance();
@@ -46,6 +51,7 @@ int main(int argc, char** argv)
 
   FolderSet folderSet;
   folderSet.setSourcePath(configManager->getSourceFolderPair());
+  folderSet.setLastOperatedIndex(configManager->getLastOperatedIndex());
   folderSet.setDestinationPathList(configManager->getDestinationPathList());
 
   QObject::connect(&folderSet, &FolderSet::sourcePathChanged,
@@ -59,6 +65,13 @@ int main(int argc, char** argv)
   {
     configManager->setDestinationPathList(folderSet.getDestinationPathList());
   });
+  QObject::connect(&folderSet, &FolderSet::lastOperatedIndexChanged,
+          [configManager, &folderSet]()
+  {
+    configManager->setLastOperatedIndex(folderSet.getLastOperatedIndex());
+  });
+
+  Proxy proxy;
 
   QQmlApplicationEngine engine;
 
@@ -66,6 +79,8 @@ int main(int argc, char** argv)
                                            &folderSet);
   engine.rootContext()->setContextProperty("cppFileOperationHandler",
                                            &operationHandler);
+  engine.rootContext()->setContextProperty("cppProxy",
+                                           &proxy);
 
   engine.load(QUrl("qrc:/main.qml"));
 

@@ -32,4 +32,5 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib")
 
 include(GenerateExportHeader)
 
+add_subdirectory(3rdparty)
 add_subdirectory(src)

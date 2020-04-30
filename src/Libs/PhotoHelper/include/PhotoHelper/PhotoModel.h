@@ -4,7 +4,10 @@
 #include <photohelper_export.h>
 
 #include <QAbstractListModel>
+#include <QFileInfo>
 #include <QStringList>
+
+class QQmlPropertyMap;
 
 namespace PhotoHelper {
 
@@ -15,20 +18,33 @@ class PHOTOHELPER_EXPORT PhotoModel : public QAbstractListModel
              READ selectedIndexes
              WRITE setSelectedIndexes
              NOTIFY selectedIndexesChanged)
+  Q_PROPERTY(int elementsCount
+             READ elementsCount
+             NOTIFY elementsCountChanged)
+  Q_PROPERTY(QStringList destinationPathList
+             READ getDestinationPathList
+             WRITE setDestinationPathList
+             NOTIFY destinationPathListChanged)
+  Q_PROPERTY(QStringList destinationPathNameList
+             READ getDestinationPathNameList
+             WRITE setDestinationPathNameList
+             NOTIFY destinationPathNameListChanged)
 public:
   enum Roles {
-      NameRole = Qt::UserRole + 1,
-      PathRole,
-      SelectedRole
+    NameRole = Qt::UserRole + 1,
+    PathRole,
+    SelectedRole,
+    OrientationRole,
+    ContainsRole
   };
 
-  PhotoModel(QObject *parent = nullptr);
+  explicit PhotoModel(QObject *parent = nullptr);
 
   int rowCount(const QModelIndex &parent) const override;
   QVariant data(const QModelIndex &index, int role) const override;
   QHash<int, QByteArray> roleNames() const override;
 
-  Q_INVOKABLE void setData(const QStringList &data);
+  Q_INVOKABLE void setData(const QStringList &pathList);
 
   //! Удаление элемента
   Q_INVOKABLE void deleteItem(int index);
@@ -48,12 +64,57 @@ public:
   Q_INVOKABLE QList<int> selectedIndexes() const;
   Q_INVOKABLE void setSelectedIndexes(const QList<int> &list);
 
-signals:
-  void selectedIndexesChanged();
+  Q_INVOKABLE void rotateRight(int index);
+  Q_INVOKABLE void rotateRightSelectedIndexes();
+
+  Q_INVOKABLE int elementsCount() const;
+
+  Q_INVOKABLE void setDestinationPathList(QStringList const& pathList);
+  Q_INVOKABLE QStringList getDestinationPathList();
+
+  Q_INVOKABLE void setDestinationPathNameList(QStringList const& nameList);
+  Q_INVOKABLE QStringList getDestinationPathNameList();
+
+  //! Отправляет сигнал об обновлении элемента
+  Q_INVOKABLE void emitUpdateData(int index);
+
+  //! Задает индекс элемента, который необходимо загрузить
+  Q_INVOKABLE void setLastOperatedIndex(int index);
+
+  //! Удаляет данные модели
+  Q_INVOKABLE void clear();
+
+  //! Обновляет данные после копирования файла
+  Q_INVOKABLE void onFileCopied(int index, QString const& folderPath);
+
+  Q_INVOKABLE void setDestinationPathFilesCache(QQmlPropertyMap*);
 
 private:
-  QStringList m_data;
-  QList<int> m_selectedIndexes;
+  int getOrientation(int index) const;
+  QStringList getContainsColors(int index) const;
+
+signals:
+  void selectedIndexesChanged();
+  void elementsCountChanged();
+  void destinationPathListChanged();
+  void destinationPathNameListChanged();
+
+protected:
+  bool canFetchMore(const QModelIndex &parent) const override;
+  void fetchMore(const QModelIndex &parent) override;
+
+private:
+  QStringList m_pathList;                ///< Список путей до изображений
+  QList<int> m_selectedIndexes;          ///< Индексы выделенных элементов
+  unsigned int m_fetchedItemCount;       ///< Количество загруженных элементов
+  unsigned int m_lastOperatedIndex;
+  QStringList m_destinationPathList;     ///< Пути до папок назначения
+  QStringList m_destinationPathNameList; ///< Названия папок назначения
+  mutable QHash<QString, int> m_orientationCache;
+  mutable QHash<QString, QStringList> m_containsColorsCache;
+
+  // Список файлов в целевых директориях
+  mutable QHash<QString, QStringList> m_destinationPathFilesCache;
 };
 
 } // !PhotoHelper

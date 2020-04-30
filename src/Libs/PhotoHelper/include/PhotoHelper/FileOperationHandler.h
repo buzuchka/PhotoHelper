@@ -5,10 +5,21 @@
 
 #include <PhotoHelper/Types.h>
 
+#include <QFileInfo>
 #include <QObject>
 #include <QVariant>
 
+#include <QtQml/QQmlPropertyMap>
+
 namespace PhotoHelper {
+
+enum RightOrientation
+{
+  Normal = 0, // exif = 1
+  Right,      // exif = 6
+  UpsideDown, // exif = 3
+  Left        // exif = 8
+};
 
 class PHOTOHELPER_EXPORT FileOperationHandler : public QObject
 {
@@ -31,7 +42,19 @@ public:
   Q_INVOKABLE void deleteFile(const QString &filePath);
   Q_INVOKABLE void deleteFiles(const QStringList &filePathList);
 
-  Q_INVOKABLE QStringList getImagesPathList(const QString &path);
+  static QStringList getImagesPathList(const QString &path);
+  Q_INVOKABLE QStringList getImagesOrientationList(const QString &path);
+
+  // Возвращает ориентацию изоюражения
+  static int getImageOrientation(const QString &path);
+
+  // Поворот изображения вправо
+  static void rotateRightImage(const QString &filePath);
+
+  // Поворот нескольких изображений вправо
+  Q_INVOKABLE void rotateRightImages(const QStringList &filePathList);
+
+  static QQmlPropertyMap* getDestinationPathFilesCache(QStringList const& destinationPathList);
 };
 
 } // !PhotoHelper

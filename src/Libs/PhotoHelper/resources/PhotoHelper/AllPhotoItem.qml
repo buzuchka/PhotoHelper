@@ -7,27 +7,50 @@ Item {
   property var photoModel
   property var fileOperationHandler
 
+  property string currentPhotoIndexText: elementsCount + " " + qsTr("фото")
+  property string currentPhotoNameText: ""
+
   property int photoSize: 200
   property int photoSpacing: 10
 
   property int previousIndex: -1 // индекс предыдущего выбранного элемента
   property int outsideIndex: -1  // индекс элемента, который необходимо установить текущим выбранным
 
-  property int mainCurrentIndex: photoModel.selectedIndexes.lenght > 0 ?
-                                   photoModel.selectedIndexes[0] :
-                                   0
+  // Для передачи при переключении между режимами
+  property int mainCurrentIndex1: photoModel.selectedIndexes.length > 0 ?
+                                     photoModel.selectedIndexes[0] :
+                                     0
+
+  function updateFocus() {
+  }
+
+  function forwardClicked() {
+  }
+
+  function backClicked() {
+  }
 
   function copyPhoto(path) {
-      fileOperationHandler.copyFiles(
-            photoModel.getFilePathList(photoModel.selectedIndexes),
-            path)
+    fileOperationHandler.copyFiles(
+          photoModel.getFilePathList(photoModel.selectedIndexes),
+          path)
+    for(var i = 0; i < photoModel.selectedIndexes.length; ++i) {
+      photoModel.onFileCopied(photoModel.selectedIndexes[i], path);
+      photoModel.emitUpdateData(photoModel.selectedIndexes[i])
+    }
   }
 
   function deletePhoto() {
       fileOperationHandler.deleteFiles(
-            photoModel.getFilePathList(selectedIndexes))
+            photoModel.getFilePathList(photoModel.selectedIndexes))
       photoModel.deleteItems(photoModel.selectedIndexes)
       photoModel.setSelectedIndexes([])
+  }
+
+  function rotateRightPhoto() {
+    fileOperationHandler.rotateRightImages(
+          photoModel.getFilePathList(photoModel.selectedIndexes))
+    photoModel.rotateRightSelectedIndexes()
   }
 
   function setRowRange(select, first, last) {
@@ -83,17 +106,59 @@ Item {
           anchors.fill: parent
           anchors.margins: photoSpacing
 
-          Image {
-            id: photo
+          Item {
+            id: photoWrapper
 
             Layout.fillWidth: true
             Layout.fillHeight: true
 
-            verticalAlignment: Image.AlignBottom
+            clip: true
 
-            cache: false
-            fillMode: Image.PreserveAspectFit;
-            source: "file:" + model.path
+            // Изображение
+            Image {
+              id: photo
+
+              asynchronous: true
+              cache: true
+
+              anchors.centerIn: parent
+
+              width: (model.orientation === 0) || (model.orientation === 2) ?
+                       parent.width : parent.height
+              height: (model.orientation === 1) || (model.orientation === 3) ?
+                       parent.height : parent.width
+
+              verticalAlignment: (model.orientation === 0) || (model.orientation === 2) ?
+                                   Image.AlignBottom : Image.AlignVCenter
+
+              fillMode: Image.PreserveAspectFit;
+              source: "file:" + model.path
+
+              rotation: 90 * model.orientation
+            }
+
+            // Индикаторы наличия в папках
+            Row {
+              anchors {
+                top: parent.top
+                right: parent.right
+              }
+
+              spacing: photoSize / 20
+
+              Repeater {
+                model: dircontains
+
+                Rectangle {
+                  color: modelData
+                  width: photoSize / 10
+                  height: width
+                  border.width: 1
+                }
+              }
+            }
+
+
           }
 
           Text {
@@ -133,9 +198,9 @@ Item {
         onWheel: {
           if (wheel.modifiers & Qt.ControlModifier) {
             if (wheel.angleDelta.y > 0)
-                factor = 2.0;
+                factor = 1.25;
             else
-                factor = 0.5;
+                factor = 0.75;
 
             if(view.cellWidth * factor >= photoSize &&
                view.cellWidth * factor < view.height)
@@ -144,21 +209,6 @@ Item {
           else
             wheel.accepted = false
         }
-      }
-    }
-
-    RowLayout {
-      Layout.fillWidth: true
-      Layout.fillHeight: true
-
-      Layout.maximumHeight: 30
-
-      Text {
-          Layout.fillWidth: true
-          Layout.fillHeight: true
-          verticalAlignment: Text.AlignVCenter
-
-          text: view.count + " " + qsTr("фото")
       }
     }
   }

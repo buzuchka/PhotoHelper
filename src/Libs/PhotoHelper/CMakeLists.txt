@@ -1,9 +1,10 @@
 project(PhotoHelper)
 
 find_package(Qt5Widgets QUIET)
+find_package(Qt5Qml QUIET)
 
-include_directories(${Qt5Widgets_INCLUDE_DIRS})
-set(QTLIBRARIES ${Qt5Widgets_LIBRARIES})
+include_directories(${Qt5Widgets_INCLUDE_DIRS} ${Qt5Qml_INCLUDE_DIRS})
+set(QTLIBRARIES ${Qt5Widgets_LIBRARIES} ${Qt5Qml_LIBRARIES})
 
 file(GLOB_RECURSE INCLUDE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/include/*.h**")
 file(GLOB_RECURSE HEADER_FILES  "${CMAKE_CURRENT_SOURCE_DIR}/src/*.h**")
@@ -21,7 +22,9 @@ target_include_directories(${PROJECT_NAME}
 PUBLIC
   "${CMAKE_CURRENT_SOURCE_DIR}/include"
   ${CMAKE_CURRENT_BINARY_DIR}
+  ${EXPAT_INCLUDE_DIRS}
 PRIVATE
+  ${CMAKE_BINARY_DIR}
   "${CMAKE_CURRENT_SOURCE_DIR}/include/PhotoHelper"
   "${CMAKE_CURRENT_SOURCE_DIR}/src"
 )
@@ -29,6 +32,9 @@ PRIVATE
 target_link_libraries(${PROJECT_NAME}
 PRIVATE
   ${QTLIBRARIES}
+  ${ZLIB_LIBRARIES}
+  ${EXPAT_LIBRARIES}
+  exiv2lib
 )
 
 set_target_properties(${PROJECT_NAME} PROPERTIES

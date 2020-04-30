@@ -1,6 +1,6 @@
 <RCC>
     <qresource prefix="/">
-        <file>PhotoHelper/InitialDialog.qml</file>
+        <file>PhotoHelper/SettingsDialog.qml</file>
         <file>PhotoHelper/qmldir</file>
         <file>PhotoHelper/AllPhotoItem.qml</file>
         <file>PhotoHelper/MainWindow.qml</file>
