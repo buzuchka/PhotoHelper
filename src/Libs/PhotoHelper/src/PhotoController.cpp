@@ -7,6 +7,8 @@
 
 #include <QColor>
 
+#include <QtQml/QQmlEngine>
+
 namespace PhotoHelper {
 
 QColor GetColorByName(const QString& name);
@@ -17,6 +19,9 @@ PhotoController::PhotoController(QObject *parent)
   , m_destinationFolderModel(new DestinationFolderModel)
   , m_currentIndex(0)
 {
+  QQmlEngine::setObjectOwnership(m_photoModel, QQmlEngine::CppOwnership);
+  QQmlEngine::setObjectOwnership(m_destinationFolderModel, QQmlEngine::CppOwnership);
+
   connect(this, &PhotoController::currentIndexChanged,
           this, &PhotoController::currentPhotoNameChanged);
   connect(this, &PhotoController::currentIndexChanged,
@@ -106,6 +111,21 @@ void PhotoController::copyCurrentPhoto(const QString &path)
   updateDestinationFolderModelContainsState();
 }
 
+void PhotoController::copySelectedPhotos(const QString &path)
+{
+  for(int i = 0; i < m_selectedIndexes.count(); ++i)
+  {
+    QString copiedPhotoName = FileOperationHandler::copyFile(
+          m_photoModel->getFilePath(m_selectedIndexes.at(i)), path);
+
+    if(copiedPhotoName.isEmpty())
+      continue;
+
+    m_photoModel->onPhotoCopied(m_selectedIndexes.at(i), path, copiedPhotoName);
+  }
+  updateDestinationFolderModelContainsState();
+}
+
 void PhotoController::deleteCurrentPhotoFromSource()
 {
   FileOperationHandler::deleteFile(getCurrentPhotoPath());
@@ -113,6 +133,18 @@ void PhotoController::deleteCurrentPhotoFromSource()
   if(m_currentIndex == getElementsCount() - 1)
     decreaseCurrentIndex();
   emit elementsCountChanged();
+}
+
+void PhotoController::deleteSelectedPhotosFromSource()
+{
+  for(int i = 0; i < m_selectedIndexes.count(); ++i)
+  {
+    FileOperationHandler::deleteFile(
+          m_photoModel->getFilePath(m_selectedIndexes.at(i)));
+    m_photoModel->deleteItem(m_selectedIndexes.at(i));
+  }
+
+  setSelectedIndexes({});
 }
 
 void PhotoController::deleteCurrentPhotoFromDestination(QString const& path)
@@ -123,10 +155,34 @@ void PhotoController::deleteCurrentPhotoFromDestination(QString const& path)
   updateDestinationFolderModelContainsState();
 }
 
+void PhotoController::deleteSelectedPhotosFromDestination(const QString &path)
+{
+  for(int i = 0; i < m_selectedIndexes.count(); ++i)
+  {
+    FileOperationHandler::deleteFileFromFolder(
+          m_photoModel->getFilePath(m_selectedIndexes.at(i)), path);
+    m_photoModel->onPhotoDeletedFromDestination(m_selectedIndexes.at(i), path);
+  }
+  updateDestinationFolderModelContainsState();
+}
+
 void PhotoController::rotateCurrentPhotoRight()
 {
   FileOperationHandler::rotateRightImage(getCurrentPhotoPath());
   m_photoModel->onOrientationChanged(m_currentIndex);
+}
+
+void PhotoController::rotateSelectedPhotosRight()
+{
+  for(int i = 0; i < m_selectedIndexes.count(); ++i)
+  {
+    if(m_photoModel->getOrientation(m_selectedIndexes.at(i)) == RightOrientation::Undefined)
+      continue;
+
+    FileOperationHandler::rotateRightImage(m_photoModel->getFilePath(
+                                             m_selectedIndexes.at(i)));
+    m_photoModel->onOrientationChanged(m_selectedIndexes.at(i));
+  }
 }
 
 bool PhotoController::isCurrentPhotoOrientationCorrect() const
@@ -141,8 +197,27 @@ QString PhotoController::getCurrentPhotoPath() const
 
 void PhotoController::updateDestinationFolderModelContainsState()
 {
-  QList<bool> states = m_photoModel->getContainsState(m_currentIndex);
-  m_destinationFolderModel->setContainsCurrentPhotoList(states);
+  if(!m_selectedIndexes.isEmpty())
+  {
+
+  }
+  else
+  {
+    QList<bool> states = m_photoModel->getContainsState(m_currentIndex);
+    m_destinationFolderModel->setContainsCurrentPhotoList(states);
+
+  }
+}
+
+QList<int> PhotoController::selectedIndexes() const
+{
+  return m_selectedIndexes;
+}
+
+void PhotoController::setSelectedIndexes(const QList<int> &indexes)
+{
+  m_selectedIndexes = indexes;
+  emit selectedIndexesChanged();
 }
 
 }

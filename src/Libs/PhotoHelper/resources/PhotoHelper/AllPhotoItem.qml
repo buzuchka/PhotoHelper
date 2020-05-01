@@ -13,14 +13,9 @@ Item {
   property int photoSpacing: 10
 
   property int previousIndex: -1 // индекс предыдущего выбранного элемента
-  property int outsideIndex: -1  // индекс элемента, который необходимо установить текущим выбранным
-
-  // Для передачи при переключении между режимами
-  property int mainCurrentIndex: photoModel.selectedIndexes.length > 0 ?
-                                     photoModel.selectedIndexes[0] :
-                                     0
 
   function updateFocus() {
+    view.forceActiveFocus()
   }
 
   function forwardClicked() {
@@ -30,37 +25,23 @@ Item {
   }
 
   function copyPhoto(path) {
-    fileOperationHandler.copyFiles(
-          photoModel.getFilePathList(photoModel.selectedIndexes),
-          path)
-    for(var i = 0; i < photoModel.selectedIndexes.length; ++i) {
-      photoModel.onFileCopied(photoModel.selectedIndexes[i], path);
-      photoModel.emitUpdateData(photoModel.selectedIndexes[i])
-    }
+    photoController.copySelectedPhotos(path)
   }
 
   function deletePhoto() {
-      fileOperationHandler.deleteFiles(
-            photoModel.getFilePathList(photoModel.selectedIndexes))
-      photoModel.deleteItems(photoModel.selectedIndexes)
-      photoModel.setSelectedIndexes([])
+    photoController.deleteSelectedPhotosFromSource()
   }
 
-  function deletePhotoFromFolder() {
-    fileOperationHandler.deletePhotosFromFolder(
-          photoModel.getFilePathList(photoModel.selectedIndexes),
-          folderPath)
-
+  function deletePhotoFromFolder(folderPath) {
+    photoController.deleteSelectedPhotosFromDestination(folderPath)
   }
 
   function rotateRightPhoto() {
-    fileOperationHandler.rotateRightImages(
-          photoModel.getFilePathList(photoModel.selectedIndexes))
-    photoModel.rotateRightSelectedIndexes()
+    photoController.rotateSelectedPhotosRight()
   }
 
   function setRowRange(select, first, last) {
-    var selectedIndexes = photoModel.selectedIndexes
+    var selectedIndexes = photoController.selectedIndexes
     var start = first <= last ? first : last
     var stop = first <= last ? last : first
     for (var i = start ; i <= stop ; ++ i) {
@@ -73,7 +54,7 @@ Item {
                 selectedIndexes.splice(indexAt, 1);
         }
     }
-    photoModel.setSelectedIndexes(selectedIndexes)
+    photoController.setSelectedIndexes(selectedIndexes)
   }
 
   ColumnLayout {
@@ -92,7 +73,7 @@ Item {
       focus: true
       cacheBuffer: 20
 
-      model: photoModel
+      model: photoController.getPhotoModel()
 
       delegate:  Item {
         id: photoDelegate
@@ -101,7 +82,7 @@ Item {
         height: GridView.view.cellHeight
 
         Rectangle {
-          property bool isSelected: photoModel.selectedIndexes.indexOf(index) !== -1
+          property bool isSelected: photoController.selectedIndexes.indexOf(index) !== -1
 
           anchors.fill: parent
           color: "lightsteelblue";
@@ -129,12 +110,17 @@ Item {
 
               anchors.centerIn: parent
 
-              width: (model.orientation === 0) || (model.orientation === 2) ?
+              width: (model.orientation === 0) ||
+                     (model.orientation === 2) ||
+                     (model.orientation === 4) ?
                        parent.width : parent.height
-              height: (model.orientation === 1) || (model.orientation === 3) ?
+              height: (model.orientation === 1) ||
+                      (model.orientation === 3) ?
                        parent.height : parent.width
 
-              verticalAlignment: (model.orientation === 0) || (model.orientation === 2) ?
+              verticalAlignment: (model.orientation === 0) ||
+                                 (model.orientation === 2) ||
+                                 (model.orientation === 4) ?
                                    Image.AlignBottom : Image.AlignVCenter
 
               fillMode: Image.PreserveAspectFit;
@@ -163,13 +149,9 @@ Item {
                 }
               }
             }
-
-
           }
 
           Text {
-            id: contactInfo
-
             Layout.fillWidth: true
 
             text: model.name
@@ -183,12 +165,12 @@ Item {
             if (mouse.modifiers & Qt.ShiftModifier) {
               setRowRange(true, previousIndex, index)
             } else {
-              var hasIndex = photoModel.selectedIndexes.indexOf(index) !== -1
+              var hasIndex = photoController.selectedIndexes.indexOf(index) !== -1
               if (mouse.modifiers & Qt.ControlModifier) {
                 setRowRange(!hasIndex, index, index)
               } else {
-                photoModel.setSelectedIndexes(
-                      (photoModel.selectedIndexes.length === 1 && hasIndex) ? [] : [index])
+                photoController.setSelectedIndexes(
+                      (photoController.selectedIndexes.length === 1 && hasIndex) ? [] : [index])
               }
             }
             previousIndex = index
@@ -220,12 +202,8 @@ Item {
   }
 
   Component.onCompleted: {
-    view.forceActiveFocus()
-
-    if(outsideIndex > 0) {
-      view.positionViewAtIndex(outsideIndex, GridView.Beginning)
-      photoModel.setSelectedIndexes([outsideIndex])
-    }
+    view.positionViewAtIndex(photoController.currentIndex, GridView.Beginning)
+    updateFocus()
   }
 }
 

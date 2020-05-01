@@ -35,8 +35,6 @@ QVariant PhotoModel::data(const QModelIndex &index, int role) const
       return QFileInfo(m_pathList.at(index.row())).fileName();
   case PathRole:
       return m_pathList.at(index.row());
-  case SelectedRole:
-    return m_selectedIndexes.contains(index.row());
   case OrientationRole:
     return getOrientation(index.row());
   case ContainsRole:
@@ -51,7 +49,6 @@ QHash<int, QByteArray> PhotoModel::roleNames() const
   QHash<int, QByteArray> roles = QAbstractListModel::roleNames();
   roles[NameRole] = "name";
   roles[PathRole] = "path";
-  roles[SelectedRole] = "selected";
   roles[OrientationRole] = "orientation";
   roles[ContainsRole] = "dircontains";
 
@@ -91,11 +88,7 @@ void PhotoModel::onPhotoCopied(int index,
 void PhotoModel::onPhotoDeletedFromDestination(int index,
                                                const QString &path)
 {
-//  auto files = m_destinationPathFilesCache.value(path);
-//  files.removeOne();
-//
-//  m_destinationPathFilesCache.remove(path);
-//  m_destinationPathFilesCache.insert(path, files);
+  m_containsColorsCache.remove(m_pathList.at(index));
 
   emitUpdateData(index);
 }
@@ -140,17 +133,6 @@ QString PhotoModel::getFileName(int index)
   return fileInfo.fileName();
 }
 
-QList<int> PhotoModel::selectedIndexes() const
-{
-  return m_selectedIndexes;
-}
-
-void PhotoModel::setSelectedIndexes(const QList<int> &indexes)
-{
-  m_selectedIndexes = indexes;
-  emit selectedIndexesChanged();
-}
-
 int PhotoModel::getElementsCount() const
 {
   return m_pathList.size();
@@ -181,7 +163,6 @@ void PhotoModel::setFolderPathColorCache(const QList<QPair<QString, QString>> &m
 void PhotoModel::clear()
 {
   setData({});
-  setSelectedIndexes({});
   m_lastOperatedIndex = 0;
   m_orientationCache.clear();
 }
@@ -221,6 +202,7 @@ QStringList PhotoModel::getContainsColors(int index) const
                                                   tmp))
       colorList.push_back(m_folderPathColorCache.at(i).second);
   }
+  m_containsColorsCache.insert(filePath, colorList);
   return colorList;
 }
 
@@ -243,6 +225,9 @@ void PhotoModel::fetchMore(const QModelIndex &parent)
     return;
 
   int chunkSize = 25;
+
+  if(chunkSize > m_pathList.count())
+    chunkSize = m_pathList.count();
 
   int remainder = m_pathList.size() - m_fetchedItemCount;
   int itemsToFetch = qMin(chunkSize, remainder);

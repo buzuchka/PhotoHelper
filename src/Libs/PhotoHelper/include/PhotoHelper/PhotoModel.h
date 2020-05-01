@@ -14,15 +14,10 @@ namespace PhotoHelper {
 class PHOTOHELPER_EXPORT PhotoModel : public QAbstractListModel
 {
   Q_OBJECT
-  Q_PROPERTY(QList<int> selectedIndexes
-             READ selectedIndexes
-             WRITE setSelectedIndexes
-             NOTIFY selectedIndexesChanged)
 public:
   enum Roles {
     NameRole = Qt::UserRole + 1,
     PathRole,
-    SelectedRole,
     OrientationRole,
     ContainsRole
   };
@@ -78,9 +73,6 @@ public:
   //! Возвращает статус содержания в папках назначения для индекса
   QList<bool> getContainsState(int index);
 
-  Q_INVOKABLE QList<int> selectedIndexes() const;
-  Q_INVOKABLE void setSelectedIndexes(const QList<int> &list);
-
 //  //! Удаление нескольких элементов
 //  Q_INVOKABLE void deleteItems(QList<int> const& indexes);
 //
@@ -88,12 +80,6 @@ public:
 //  Q_INVOKABLE QStringList getFilePathList(QList<int> const& indexes);
 //
 //  Q_INVOKABLE void rotateRightSelectedIndexes();
-//
-//  Q_INVOKABLE void setDestinationPathList(QStringList const& pathList);
-//  Q_INVOKABLE QStringList getDestinationPathList();
-//
-//  Q_INVOKABLE void setDestinationPathNameList(QStringList const& nameList);
-//  Q_INVOKABLE QStringList getDestinationPathNameList();
 //
 //  void deletePhotoFromFolder(int index, QString const& path);
 
@@ -128,8 +114,6 @@ private:
 
   // Кэш цветов каталогов, в которых содержатся фото
   mutable QHash<QString /*photoPath*/, QStringList /*colors*/> m_containsColorsCache;
-
-  QList<int> m_selectedIndexes;          ///< Индексы выделенных элементов
 };
 
 } // !PhotoHelper

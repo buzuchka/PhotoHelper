@@ -28,6 +28,10 @@ class PhotoController : public QObject
   Q_PROPERTY(bool isCurrentPhotoOrientationCorrect
              READ isCurrentPhotoOrientationCorrect
              NOTIFY isCurrentPhotoOrientationCorrectChanged)
+  Q_PROPERTY(QList<int> selectedIndexes
+             READ selectedIndexes
+             WRITE setSelectedIndexes
+             NOTIFY selectedIndexesChanged)
 public:
   PhotoController(QObject * parent = nullptr);
 
@@ -53,26 +57,39 @@ public:
   //! Копирует текущее фото в папку path
   Q_INVOKABLE void copyCurrentPhoto(QString const& path);
 
+  //! Копирует выбранные фото в папку path
+  Q_INVOKABLE void copySelectedPhotos(QString const& path);
+
   //! Удаляет текущее фото из исходной папки
   Q_INVOKABLE void deleteCurrentPhotoFromSource();
+
+  //! Удаляет выбранные фото из исходной папки
+  Q_INVOKABLE void deleteSelectedPhotosFromSource();
 
   //! Удаляет текущее фото из папки назначения
   Q_INVOKABLE void deleteCurrentPhotoFromDestination(QString const& path);
 
+  //! Удаляет выбранные фото из папки назначения
+  Q_INVOKABLE void deleteSelectedPhotosFromDestination(QString const& path);
+
   //! Поворачивает текущее фото вправо
   Q_INVOKABLE void rotateCurrentPhotoRight();
+
+  //! Поворачивает выбранные фото вправо
+  Q_INVOKABLE void rotateSelectedPhotosRight();
 
   //! Возвращает флаг корректности ориентации текущего фото
   Q_INVOKABLE bool isCurrentPhotoOrientationCorrect() const;
 
-  //! Возвращает флаги содержания каталогами текущего фото
-  Q_INVOKABLE QList<bool> isFolderContainsCurrentPhoto() const;
+  Q_INVOKABLE QList<int> selectedIndexes() const;
+  Q_INVOKABLE void setSelectedIndexes(const QList<int> &list);
 
 signals:
   void elementsCountChanged();
   void currentIndexChanged();
   void currentPhotoNameChanged();
   void isCurrentPhotoOrientationCorrectChanged();
+  void selectedIndexesChanged();
 
 private:
   //! Возвращает путь до текущего фото
@@ -89,7 +106,8 @@ private:
   PhotoModel * m_photoModel;
   DestinationFolderModel * m_destinationFolderModel;
 
-  int m_currentIndex; ///< Текущий индекс в m_photoModel
+  int m_currentIndex;           ///< Текущий индекс в m_photoModel
+  QList<int> m_selectedIndexes; ///< Индексы выделенных элементов
 };
 
 }

@@ -104,11 +104,10 @@ Item {
 
               width: (model.orientation === 0) ||
                      (model.orientation === 2) ||
-                     (model.orientation === 4)?
+                     (model.orientation === 4) ?
                        parent.width : parent.height
-              height: (model.orientation === 0) ||
-                      (model.orientation === 2) ||
-                      (model.orientation === 4) ?
+              height: (model.orientation === 1) ||
+                      (model.orientation === 3) ?
                        parent.height : parent.width
 
               fillMode: Image.PreserveAspectFit
