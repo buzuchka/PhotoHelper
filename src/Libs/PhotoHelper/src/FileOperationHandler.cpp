@@ -89,22 +89,9 @@ QString FileOperationHandler::copyFile(const QString &filePath,
   return QFileInfo(toFilePath).fileName();
 }
 
-void FileOperationHandler::copyFiles(const QStringList &filePathList,
-                                     const QString &destinationPath)
-{
-  for(auto const& filePath : filePathList)
-    copyFile(filePath, destinationPath);
-}
-
 void FileOperationHandler::deleteFile(const QString &filePath)
 {
   QFile::remove(filePath);
-}
-
-void FileOperationHandler::deleteFiles(const QStringList &filePathList)
-{
-  for(auto const& filePath : filePathList)
-    QFile::remove(filePath);
 }
 
 void FileOperationHandler::deleteFileFromFolder(const QString &photoFilePath,
@@ -115,14 +102,6 @@ void FileOperationHandler::deleteFileFromFolder(const QString &photoFilePath,
                                                 photoFilePath,
                                                 destFileName))
     QFile::remove(folderPath + QDir::separator() + destFileName);
-}
-
-void FileOperationHandler::deletePhotosFromFolder(
-    const QStringList &photoFilePathList,
-    const QString &folderPath)
-{
-  for(auto const& photoFilePath : photoFilePathList)
-    deleteFileFromFolder(photoFilePath, folderPath);
 }
 
 QStringList FileOperationHandler::getImagesPathList(const QString &path)
@@ -136,18 +115,6 @@ QStringList FileOperationHandler::getImagesPathList(const QString &path)
     name.prepend(path + QDir::separator());
 
   return nameList;
-}
-
-QStringList FileOperationHandler::getImagesOrientationList(const QString &path)
-{
-  QStringList orientationList;
-
-  auto pathList = getImagesPathList(path);
-  for(auto &filePath : pathList)
-  {
-    orientationList.push_back(QString::number(getImageOrientation(filePath)));
-  }
-  return orientationList;
 }
 
 // Поворот изображения вправо
@@ -175,12 +142,6 @@ void FileOperationHandler::rotateRightImage(const QString &filePath)
   ed[exifOrientationTag.toStdString().c_str()] = uint16_t(newOrientationExif);
   image->setExifData(ed);
   image->writeMetadata();
-}
-
-void FileOperationHandler::rotateRightImages(const QStringList &pathList)
-{
-  for(auto & path : pathList)
-    rotateRightImage(path);
 }
 
 int FileOperationHandler::getImageOrientation(const QString &filePath)

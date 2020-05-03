@@ -35,28 +35,18 @@ public:
                           const QString &destinationPath,
                           const QString &destinationFileName = QString());
 
-  void copyFiles(const QStringList &filePathList,
-                             const QString &destinationPath);
-
   static void deleteFile(const QString &filePath);
-  void deleteFiles(const QStringList &filePathList);
 
   static void deleteFileFromFolder(QString const& filePath,
                                    QString const& folderPath);
-  void deletePhotosFromFolder(QStringList const& photoFilePathList,
-                                          QString const& folderPath);
 
   static QStringList getImagesPathList(const QString &path);
-  QStringList getImagesOrientationList(const QString &path);
 
   //! Возвращает ориентацию изображения
   static int getImageOrientation(const QString &path);
 
   //! Поворот изображения вправо
   static void rotateRightImage(const QString &filePath);
-
-  //! Поворот нескольких изображений вправо
-  void rotateRightImages(const QStringList &filePathList);
 
   //! Проверяет, что файл содержится в папке
   //! folderPath - путь до папки

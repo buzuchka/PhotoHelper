@@ -73,16 +73,6 @@ public:
   //! Возвращает статус содержания в папках назначения для индекса
   QList<bool> getContainsState(int index);
 
-//  //! Удаление нескольких элементов
-//  Q_INVOKABLE void deleteItems(QList<int> const& indexes);
-//
-//  //! Возвращает список путей по индексам
-//  Q_INVOKABLE QStringList getFilePathList(QList<int> const& indexes);
-//
-//  Q_INVOKABLE void rotateRightSelectedIndexes();
-//
-//  void deletePhotoFromFolder(int index, QString const& path);
-
 signals:
   void selectedIndexesChanged();
 
