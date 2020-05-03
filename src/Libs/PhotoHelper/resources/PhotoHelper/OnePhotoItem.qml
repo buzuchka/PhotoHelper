@@ -241,6 +241,7 @@ Item {
     }
   }
   Component.onCompleted: {
+    photoController.switchToCurrentIndex()
     photoListView.positionViewAtIndex(photoController.currentIndex, ListView.Beginning)
     updateFocus()
   }

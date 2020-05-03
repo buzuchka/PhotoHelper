@@ -84,6 +84,12 @@ public:
   Q_INVOKABLE QList<int> selectedIndexes() const;
   Q_INVOKABLE void setSelectedIndexes(const QList<int> &list);
 
+  //! Переключение на выделение нескольких элементов
+  Q_INVOKABLE void switchToSelectedIndexes();
+
+  //! Переключение на использование одного элемента
+  Q_INVOKABLE void switchToCurrentIndex();
+
 signals:
   void elementsCountChanged();
   void currentIndexChanged();

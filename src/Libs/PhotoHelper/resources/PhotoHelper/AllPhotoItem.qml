@@ -202,6 +202,7 @@ Item {
   }
 
   Component.onCompleted: {
+    photoController.switchToSelectedIndexes()
     view.positionViewAtIndex(photoController.currentIndex, GridView.Beginning)
     updateFocus()
   }

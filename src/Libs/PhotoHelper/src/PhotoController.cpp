@@ -199,13 +199,24 @@ void PhotoController::updateDestinationFolderModelContainsState()
 {
   if(!m_selectedIndexes.isEmpty())
   {
+    QList<bool> states =  m_photoModel->getContainsState(m_currentIndex);
+    for(int i = 1; i < m_selectedIndexes.count(); ++i)
+    {
+      QList<bool> currentStates =
+          m_photoModel->getContainsState(m_selectedIndexes.at(i));
 
+      for(int i = 0; i < states.count(); ++i)
+      {
+        if(states.at(i) != currentStates.at(i))
+          states[i] = false;
+      }
+    }
+    m_destinationFolderModel->setContainsCurrentPhotoList(states);
   }
   else
   {
     QList<bool> states = m_photoModel->getContainsState(m_currentIndex);
     m_destinationFolderModel->setContainsCurrentPhotoList(states);
-
   }
 }
 
@@ -218,6 +229,17 @@ void PhotoController::setSelectedIndexes(const QList<int> &indexes)
 {
   m_selectedIndexes = indexes;
   emit selectedIndexesChanged();
+}
+
+void PhotoController::switchToSelectedIndexes()
+{
+  setSelectedIndexes({m_currentIndex});
+}
+
+void PhotoController::switchToCurrentIndex()
+{
+  if(m_selectedIndexes.count() > 0)
+    m_currentIndex = m_selectedIndexes.at(0);
 }
 
 }
