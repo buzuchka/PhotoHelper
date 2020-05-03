@@ -21,6 +21,7 @@ class PhotoController : public QObject
              NOTIFY elementsCountChanged)
   Q_PROPERTY(int currentIndex
              READ getCurrentIndex
+             WRITE setCurrentIndex
              NOTIFY currentIndexChanged)
   Q_PROPERTY(QString currentPhotoName
              READ getCurrentPhotoName
@@ -47,6 +48,7 @@ public:
                                       QQmlPropertyMap* destinationPathPhotosCache);
 
   Q_INVOKABLE int getCurrentIndex() const;
+  Q_INVOKABLE void setCurrentIndex(int index);
 
   Q_INVOKABLE void increaseCurrentIndex();
   Q_INVOKABLE void decreaseCurrentIndex();

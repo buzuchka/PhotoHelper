@@ -60,8 +60,7 @@ void PhotoController::onStartReloadData(FolderSet *folderSet)
   m_photoModel->setLastOperatedIndex(folderSet->getLastOperatedIndex());
   m_photoModel->setFolderPathColorCache(folderPathColorCache);
 
-  m_currentIndex = folderSet->getLastOperatedIndex();
-  emit currentIndexChanged();
+  setCurrentIndex(folderSet->getLastOperatedIndex());
 
   m_destinationFolderModel->init();
 }
@@ -80,6 +79,12 @@ void PhotoController::onFinishReloadData(const QStringList &sourcePhotoPathList,
 int PhotoController::getCurrentIndex() const
 {
   return m_currentIndex;
+}
+
+void PhotoController::setCurrentIndex(int index)
+{
+  m_currentIndex = index;
+  emit currentIndexChanged();
 }
 
 void PhotoController::increaseCurrentIndex()
@@ -239,7 +244,7 @@ void PhotoController::switchToSelectedIndexes()
 void PhotoController::switchToCurrentIndex()
 {
   if(m_selectedIndexes.count() > 0)
-    m_currentIndex = m_selectedIndexes.at(0);
+    setCurrentIndex(m_selectedIndexes.at(0));
 }
 
 }
