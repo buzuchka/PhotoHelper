@@ -224,7 +224,7 @@ void PhotoModel::fetchMore(const QModelIndex &parent)
   if (parent.isValid())
     return;
 
-  int chunkSize = 25;
+  int chunkSize = 5;
 
   if(chunkSize > m_pathList.count())
     chunkSize = m_pathList.count();
