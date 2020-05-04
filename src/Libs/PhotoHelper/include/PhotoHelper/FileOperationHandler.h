@@ -6,7 +6,6 @@
 #include <PhotoHelper/Types.h>
 
 #include <QFileInfo>
-#include <QObject>
 #include <QVariant>
 
 #include <QtQml/QQmlPropertyMap>
@@ -18,43 +17,47 @@ enum RightOrientation
   Normal = 0, // exif = 1
   Right,      // exif = 6
   UpsideDown, // exif = 3
-  Left        // exif = 8
+  Left,       // exif = 8
+  Undefined   // no exif data
 };
 
-class PHOTOHELPER_EXPORT FileOperationHandler : public QObject
+class PHOTOHELPER_EXPORT FileOperationHandler
 {
-  Q_OBJECT
-
 public:
-  FileOperationHandler();
+  //! Возвращает кеш с путями до файлов в каталогах destinationPathList
+  static QQmlPropertyMap* getDestinationPathFilesCache(QStringList const& destinationPathList);
 
   //! Копирование файла filePath в папку destinationPath
   //! filePath - путь до файла, который копируем
   //! destinationPath - путь назначения
   //! destinationFileName - имя файла назначения с расширением
-  Q_INVOKABLE void copyFile(const QString &filePath,
-                            const QString &destinationPath,
-                            const QString &destinationFileName = QString());
+  static QString copyFile(const QString &filePath,
+                          const QString &destinationPath,
+                          const QString &destinationFileName = QString());
 
-  Q_INVOKABLE void copyFiles(const QStringList &filePathList,
-                             const QString &destinationPath);
+  static void deleteFile(const QString &filePath);
 
-  Q_INVOKABLE void deleteFile(const QString &filePath);
-  Q_INVOKABLE void deleteFiles(const QStringList &filePathList);
+  static void deleteFileFromFolder(QString const& filePath,
+                                   QString const& folderPath);
 
   static QStringList getImagesPathList(const QString &path);
-  Q_INVOKABLE QStringList getImagesOrientationList(const QString &path);
 
-  // Возвращает ориентацию изоюражения
+  //! Возвращает ориентацию изображения
   static int getImageOrientation(const QString &path);
 
-  // Поворот изображения вправо
+  //! Поворот изображения вправо
   static void rotateRightImage(const QString &filePath);
 
-  // Поворот нескольких изображений вправо
-  Q_INVOKABLE void rotateRightImages(const QStringList &filePathList);
+  //! Проверяет, что файл содержится в папке
+  //! folderPath - путь до папки
+  //! filePath - путь до файла
+  //! fileName - имя файла в целевой директории
+  static bool isFolderContainsFile(QString const& folderPath,
+                                   QString const& filePath,
+                                   QString &fileName);
 
-  static QQmlPropertyMap* getDestinationPathFilesCache(QStringList const& destinationPathList);
+private:
+  FileOperationHandler() = delete;
 };
 
 } // !PhotoHelper

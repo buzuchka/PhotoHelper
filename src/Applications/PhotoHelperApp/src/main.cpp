@@ -1,11 +1,11 @@
-#include "Proxy.h"
-
 #include <QApplication>
 
 #include <PhotoHelper/ConfigManager.h>
+#include <PhotoHelper/DataLoader.h>
 #include <PhotoHelper/DestinationFolderModel.h>
 #include <PhotoHelper/FileOperationHandler.h>
 #include <PhotoHelper/FolderSet.h>
+#include <PhotoHelper/PhotoController.h>
 #include <PhotoHelper/PhotoModel.h>
 
 #include <QStringList>
@@ -15,19 +15,16 @@
 #include <QtQml/QQmlContext>
 #include <QtQml/QQmlApplicationEngine>
 
-#include <QImageReader>
-
 using namespace PhotoHelper;
 
 void qmlRegisterTypes()
 {
+  qmlRegisterType<DataLoader>("DataLoader", 1, 0, "DataLoader");
   qmlRegisterType<DestinationFolderModel>("DestinationFolderModel", 1, 0,
                                           "DestinationFolderModel");
-  qmlRegisterType<FileOperationHandler>("FileOperationHandler", 1, 0,
-                                        "FileOperationHandler");
   qmlRegisterType<FolderSet>("FolderSet", 1, 0, "FolderSet");
+  qmlRegisterType<PhotoController>("PhotoController", 1, 0, "PhotoController");
   qmlRegisterType<PhotoModel>("PhotoModel", 1, 0, "PhotoModel");
-  qmlRegisterType<Proxy>("Proxy", 1, 0, "Proxy");
 }
 
 int main(int argc, char** argv)
@@ -42,12 +39,13 @@ int main(int argc, char** argv)
   qmlRegisterTypes();
 
   qRegisterMetaType<QQmlPropertyMap*>("QQmlPropertyMap");
+  qRegisterMetaType<DestinationFolderModel*>("DestinationFolderModel*");
+  qRegisterMetaType<FolderSet*>("FolderSet*");
+  qRegisterMetaType<PhotoModel*>("PhotoModel*");
 
   Q_INIT_RESOURCE(PhotoHelper);
 
   auto *configManager = ConfigManager::getInstance();
-
-  FileOperationHandler operationHandler;
 
   FolderSet folderSet;
   folderSet.setSourcePath(configManager->getSourceFolderPair());
@@ -71,16 +69,10 @@ int main(int argc, char** argv)
     configManager->setLastOperatedIndex(folderSet.getLastOperatedIndex());
   });
 
-  Proxy proxy;
-
   QQmlApplicationEngine engine;
 
   engine.rootContext()->setContextProperty("cppFolderSet",
                                            &folderSet);
-  engine.rootContext()->setContextProperty("cppFileOperationHandler",
-                                           &operationHandler);
-  engine.rootContext()->setContextProperty("cppProxy",
-                                           &proxy);
 
   engine.load(QUrl("qrc:/main.qml"));
 

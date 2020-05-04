@@ -3,24 +3,21 @@ import QtQuick.Controls 2.12
 import QtQuick.Layouts 1.3
 import QtQuick.Window 2.13
 
+import DataLoader 1.0
 import DestinationFolderModel 1.0
-import FileOperationHandler 1.0
 import FolderSet 1.0
+import PhotoController 1.0
 import PhotoModel 1.0
-
-import Proxy 1.0
 
 Window {
   id: root
 
   property FolderSet folderSet
-  property FileOperationHandler fileOperationHandler
-  property Proxy proxy
 
   property int buttonWidth: 100
   property int buttonMargin: 50
 
-  property int elementsCount:  photoModel.elementsCount
+  property int elementsCount:  photoController.elementsCount
 
   function isCurrentOnePhotoItem() {
     return loader.source.toString().includes("OnePhotoItem.qml")
@@ -38,22 +35,21 @@ Window {
     replacingText.text = qsTr("Загрузка изображений")
     progressBar.visible = true
 
-    photoModel.clear()
+    photoController.onStartReloadData(folderSet)
 
-    destinationButtonModel.init()
-
-    photoModel.setLastOperatedIndex(folderSet.getLastOperatedIndex())
-    photoModel.setDestinationPathList(folderSet.getDestinationPathListAsList())
-    photoModel.setDestinationPathNameList(folderSet.getDestinationPathNameListAsList())
-
-    proxy.startLoading(folderSet.sourcePath, folderSet.getDestinationPathListAsList())
+    dataLoader.startLoading(folderSet.sourcePath,
+                            folderSet.getDestinationPathListAsList())
   }
 
   width: 800
   height: 800
 
-  PhotoModel {
-    id: photoModel
+  DataLoader {
+    id: dataLoader
+  }
+
+  PhotoController {
+    id: photoController
   }
 
   RowLayout {
@@ -67,41 +63,28 @@ Window {
 
       z: 10 // чтобы нижний текст был поверх фото
 
-      Button {
+      CustomButton {
         Layout.preferredWidth: buttonWidth
         Layout.preferredHeight: buttonWidth
 
         icon.height: buttonWidth
         icon.width: buttonWidth
         icon.color: enabled ? "transparent" : "lightgrey"
-        icon.source: "qrc:/icons/one_photo"
+        icon.source: isCurrentOnePhotoItem() ?
+                       "qrc:/icons/all_photos" :
+                       "qrc:/icons/one_photo"
 
-        enabled: (elementsCount > 0) && isCurrentAllPhotoItem()
-        onClicked: loader.setSource("OnePhotoItem.qml",
-                                    {"photoModel": photoModel,
-                                     "fileOperationHandler": fileOperationHandler,
-                                     "outsideIndex": loader.item.mainCurrentIndex1
-                                    })
+        enabled: elementsCount > 0
+        onClicked:
+            if(isCurrentOnePhotoItem())
+              loader.setSource("AllPhotoItem.qml",
+                               {"photoController": photoController})
+            else
+              loader.setSource("OnePhotoItem.qml",
+                               {"photoController": photoController})
       }
 
-      Button {
-        Layout.preferredWidth: buttonWidth
-        Layout.preferredHeight: buttonWidth
-
-        icon.height: buttonWidth
-        icon.width: buttonWidth
-        icon.color: enabled ? "transparent" : "lightgrey"
-        icon.source: "qrc:/icons/all_photos"
-
-        enabled: (elementsCount > 0) && isCurrentOnePhotoItem()
-        onClicked: loader.setSource("AllPhotoItem.qml",
-                                    {"photoModel": photoModel,
-                                     "fileOperationHandler": fileOperationHandler,
-                                     "outsideIndex": loader.item.mainCurrentIndex
-                                    })
-      }
-
-      Button {
+      CustomButton {
         Layout.preferredWidth: buttonWidth
         Layout.preferredHeight: buttonWidth
 
@@ -110,11 +93,13 @@ Window {
         icon.color: enabled ? "transparent" : "lightgrey"
         icon.source: "qrc:/icons/forward"
 
-        enabled: elementsCount > 0
+        enabled: elementsCount > 0 &&
+                 photoController.currentIndex >= 0 &&
+                 photoController.currentIndex  < elementsCount-1
         onClicked: loader.item.forwardClicked()
       }
 
-      Button {
+      CustomButton {
         Layout.preferredWidth: buttonWidth
         Layout.preferredHeight: buttonWidth
 
@@ -123,7 +108,8 @@ Window {
         icon.color: enabled ? "transparent" : "lightgrey"
         icon.source: "qrc:/icons/back"
 
-        enabled: elementsCount > 0
+        enabled: elementsCount > 0 &&
+                 photoController.currentIndex > 0
         onClicked: loader.item.backClicked()
       }
 
@@ -194,22 +180,7 @@ Window {
       Layout.fillHeight: true
       Layout.maximumWidth: buttonWidth
 
-      Button {
-        id: rotateButton
-
-        Layout.preferredWidth: buttonWidth
-        Layout.preferredHeight: buttonWidth
-
-        icon.height: buttonWidth
-        icon.width: buttonWidth
-        icon.color: enabled ? "transparent" : "lightgrey"
-        icon.source: "qrc:/icons/turn_right"
-
-        enabled: elementsCount > 0
-        onClicked: loader.item.rotateRightPhoto()
-      }
-
-      Button {
+      CustomButton {
         id: deleteButton
 
         Layout.preferredWidth: buttonWidth
@@ -228,43 +199,54 @@ Window {
         onClicked: loader.item.deletePhoto()
       }
 
+      CustomButton {
+        id: rotateButton
+
+        Layout.preferredWidth: buttonWidth
+        Layout.preferredHeight: buttonWidth
+
+        icon.height: buttonWidth
+        icon.width: buttonWidth
+        icon.color: enabled ? "transparent" : "lightgrey"
+        icon.source: "qrc:/icons/turn_right"
+
+        enabled: elementsCount > 0 &&
+                 photoController.isCurrentPhotoOrientationCorrect
+        onClicked: loader.item.rotateRightPhoto()
+      }
+
       ListView {
         Layout.fillWidth: true
         Layout.fillHeight: true
 
+        spacing: 3
         clip: true
 
-        delegate: Button {
+        delegate: CustomToggleButton {
           implicitWidth: buttonWidth
           implicitHeight: buttonWidth
+
+          isActive: model.contains
+          specialColor: model.color
 
           text: model.name
           enabled: elementsCount > 0
           action: Action {
             text: model.name
-            shortcut: "Ctrl+"+(index+1)
           }
-          onClicked: loader.item.copyPhoto(model.path)
 
-          Rectangle {
-            anchors.top: parent.top
-            anchors.right: parent.right
-            anchors.topMargin: 10
-            anchors.rightMargin: 5
-
-            width: 15
-            height: width
-
-            border.width: 1
-            color: model.color
+          onClicked: {
+            if(!isActive)
+              loader.item.copyPhoto(model.path)
+            else
+              loader.item.deletePhotoFromFolder(model.path)
+            isActive = !isActive
           }
         }
-        model: DestinationFolderModel {
-          id: destinationButtonModel
-        }
+        model: photoController.getDestinationFolderModel()
       }      
 
-      Button {
+      CustomButton {
         id: settingsButton
 
         Layout.preferredWidth: buttonWidth
@@ -284,24 +266,25 @@ Window {
     id: settingsDialog
     folderSet: root.folderSet
     title: root.title
-    onSaveButtonClicked: reloadData()
+    onSaveButtonClicked: {
+      folderSet.setLastOperatedIndex(0)
+      reloadData()
+    }
     onCloseButtonClicked: updateFocus()
   }
 
   Connections {
-    target: proxy
+    target: dataLoader
     onLoadingFinished: {
       replacingText.text = qsTr("Нет изображений")
       progressBar.visible = false
 
-      photoModel.setData(proxy.getImagesPathList())
-      photoModel.setDestinationPathFilesCache(proxy.getDestinationPathFilesCache())
+      photoController.onFinishReloadData(dataLoader.getSourcePhotoPathList(),
+                                         dataLoader.getDestinationPathPhotosCache())
 
       if (elementsCount > 0) {
         loader.setSource("OnePhotoItem.qml",
-                         {"photoModel": photoModel,
-                          "fileOperationHandler": fileOperationHandler,
-                          "outsideIndex": folderSet.getLastOperatedIndex()})
+                         {"photoController": photoController})
       }
     }
   }
@@ -310,6 +293,8 @@ Window {
     reloadData()
   }
 
+  // Сохранение индекса фото при закрытии программы
   onVisibilityChanged: if(!visible)
-                         folderSet.setLastOperatedIndex(loader.item.mainCurrentIndex)
+                         folderSet.setLastOperatedIndex(
+                               photoController.currentIndex)
 }

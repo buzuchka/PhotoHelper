@@ -203,6 +203,10 @@ Window {
     target: root
     onDestinationChooseFolderButtonClicked: {
       destinationFolderDialog.clickedIndex = index
+      destinationFolderDialog.folder =
+          (listModel.get(destinationFolderDialog.clickedIndex).path.length !== 0) ?
+                "file:///" + listModel.get(destinationFolderDialog.clickedIndex).path :
+                shortcuts.home
       destinationFolderDialog.open()
     }
   }
@@ -214,7 +218,7 @@ Window {
     selectFolder: true
     selectMultiple: false
     folder: (sourcePathTextField.text.length != 0) ?
-              sourcePathTextField.text :
+              "file:///" + sourcePathTextField.text :
               shortcuts.home
 
     onAccepted: {
@@ -240,7 +244,6 @@ Window {
     title: qsTr("Выберите папку")
     selectFolder: true
     selectMultiple: false
-    folder: shortcuts.home
 
     onAccepted: {
       var fileUrlString = destinationFolderDialog.fileUrl.toString()

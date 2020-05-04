@@ -11,8 +11,6 @@
 
 namespace PhotoHelper {
 
-QColor GetColorByName(const QString& name);
-
 std::unordered_map<int, RightOrientation> exifOrientationMap = {
   {1, RightOrientation::Normal},
   {6, RightOrientation::Right},
@@ -38,13 +36,9 @@ int exifNumberByOrientation(RightOrientation o)
 }
 
 //==============================================================================
-FileOperationHandler::FileOperationHandler()
-{
-}
-
-void FileOperationHandler::copyFile(const QString &filePath,
-                                    const QString &destinationPath,
-                                    const QString &destinationFileName)
+QString FileOperationHandler::copyFile(const QString &filePath,
+                                       const QString &destinationPath,
+                                       const QString &destinationFileName)
 {
   QFileInfo fromFileInfo(filePath);
 
@@ -61,7 +55,7 @@ void FileOperationHandler::copyFile(const QString &filePath,
     // Если это один и тот же файл, выходим
     if((fromFileInfo.size() == toFileInfo.size()) &&
        (fromFileInfo.lastModified() == toFileInfo.lastModified()))
-      return;
+      return QString();
     else
     {
       // Если это разные файлы, но с одинаковыми именами, меняем имя назначения
@@ -76,31 +70,23 @@ void FileOperationHandler::copyFile(const QString &filePath,
         {
           i = mas.toInt();
 
-          copyFile(filePath, destinationPath +
-                   QDir::separator(),
-                   (oldFileName.replace(start, mas.size(), QString::number(++i)) +
-                    "." +
-                    fromFileInfo.suffix()));
-          return;
+          return copyFile(filePath, destinationPath +
+                          QDir::separator(),
+                          (oldFileName.replace(start, mas.size(), QString::number(++i)) +
+                           "." +
+                           fromFileInfo.suffix()));
         }
       }
       else {
-        copyFile(filePath,
-                 destinationPath,
-                 (oldFileName + " (2)." + toFileInfo.suffix()));
-        return;
+        return copyFile(filePath,
+                        destinationPath,
+                        (oldFileName + " (2)." + toFileInfo.suffix()));
       }
     }
   }
 
   QFile::copy(filePath, toFilePath);
-}
-
-void FileOperationHandler::copyFiles(const QStringList &filePathList,
-                                     const QString &destinationPath)
-{
-  for(auto const& filePath : filePathList)
-    copyFile(filePath, destinationPath);
+  return QFileInfo(toFilePath).fileName();
 }
 
 void FileOperationHandler::deleteFile(const QString &filePath)
@@ -108,10 +94,14 @@ void FileOperationHandler::deleteFile(const QString &filePath)
   QFile::remove(filePath);
 }
 
-void FileOperationHandler::deleteFiles(const QStringList &filePathList)
+void FileOperationHandler::deleteFileFromFolder(const QString &photoFilePath,
+                                                const QString &folderPath)
 {
-  for(auto const& filePath : filePathList)
-    QFile::remove(filePath);
+  QString destFileName;
+  if(FileOperationHandler::isFolderContainsFile(folderPath,
+                                                photoFilePath,
+                                                destFileName))
+    QFile::remove(folderPath + QDir::separator() + destFileName);
 }
 
 QStringList FileOperationHandler::getImagesPathList(const QString &path)
@@ -125,18 +115,6 @@ QStringList FileOperationHandler::getImagesPathList(const QString &path)
     name.prepend(path + QDir::separator());
 
   return nameList;
-}
-
-QStringList FileOperationHandler::getImagesOrientationList(const QString &path)
-{
-  QStringList orientationList;
-
-  auto pathList = getImagesPathList(path);
-  for(auto &filePath : pathList)
-  {
-    orientationList.push_back(QString::number(getImageOrientation(filePath)));
-  }
-  return orientationList;
 }
 
 // Поворот изображения вправо
@@ -166,15 +144,9 @@ void FileOperationHandler::rotateRightImage(const QString &filePath)
   image->writeMetadata();
 }
 
-void FileOperationHandler::rotateRightImages(const QStringList &pathList)
-{
-  for(auto & path : pathList)
-    rotateRightImage(path);
-}
-
 int FileOperationHandler::getImageOrientation(const QString &filePath)
 {
-  RightOrientation orientation = Normal;
+  RightOrientation orientation = Undefined;
   try
   {
     Exiv2::Image::AutoPtr image = Exiv2::ImageFactory::open(filePath.toStdWString());
@@ -210,5 +182,30 @@ QQmlPropertyMap* FileOperationHandler::getDestinationPathFilesCache(QStringList 
   return map;
 }
 
+bool FileOperationHandler::isFolderContainsFile(QString const& folderPath,
+                                                QString const& filePath,
+                                                QString &fileName)
+{
+  QFileInfo sourceFileInfo(filePath);
+  QString sourceFileName = sourceFileInfo.baseName();
+
+  // Получить первые цифры из названия фото, если оно начинается на IMG_
+  if(sourceFileName.startsWith("IMG_"))
+    sourceFileName = sourceFileName.mid(4, 4);
+
+  auto destPhotoInfoList =
+      QDir(folderPath).entryInfoList({"*" + sourceFileName + "*"});
+
+  for(auto const& destPhotoInfo : destPhotoInfoList)
+  {
+    if(sourceFileInfo.size() == destPhotoInfo.size() &&
+       sourceFileInfo.lastModified() == destPhotoInfo.lastModified())
+    {
+      fileName = destPhotoInfo.fileName();
+      return true;
+    }
+  }
+  return false;
+}
 
 } // !PhotoHelper

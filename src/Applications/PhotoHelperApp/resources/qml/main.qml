@@ -8,8 +8,6 @@ MainWindow {
     title: "QML Photo Helper"
 
     folderSet: cppFolderSet
-    fileOperationHandler: cppFileOperationHandler
-    proxy: cppProxy
 
     Component.onCompleted: showMaximized()
 }

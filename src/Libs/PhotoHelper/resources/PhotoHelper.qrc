@@ -5,5 +5,7 @@
         <file>PhotoHelper/AllPhotoItem.qml</file>
         <file>PhotoHelper/MainWindow.qml</file>
         <file>PhotoHelper/OnePhotoItem.qml</file>
+        <file>PhotoHelper/CustomButton.qml</file>
+        <file>PhotoHelper/CustomToggleButton.qml</file>
     </qresource>
 </RCC>

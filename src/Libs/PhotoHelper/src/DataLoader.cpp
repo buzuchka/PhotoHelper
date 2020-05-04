@@ -1,25 +1,23 @@
-#include "Proxy.h"
+#include "DataLoader.h"
 
 #include <PhotoHelper/FileOperationHandler.h>
 
 #include <QtConcurrent/QtConcurrent>
 
-#include <QtCore/QFutureWatcher>
-
 #include <QtQml/QQmlPropertyMap>
 
-using namespace PhotoHelper;
+namespace PhotoHelper {
 
-Proxy::Proxy()
+DataLoader::DataLoader()
 {
   connect(&m_loadImagesFutureWatcher, &QFutureWatcher<QStringList>::finished,
-          this, &Proxy::startLoadingFiles);
+          this, &DataLoader::startLoadingFiles);
   connect(&m_loadFilesFutureWatcher, &QFutureWatcher<QStringList>::finished,
-          this, &Proxy::onLoadingFinished);
+          this, &DataLoader::onLoadingFinished);
 }
 
-void Proxy::startLoading(const QString &path,
-                         const QStringList &destinationPathList)
+void DataLoader::startLoading(const QString &path,
+                              const QStringList &destinationPathList)
 {
   m_destinationPathList = destinationPathList;
 
@@ -29,28 +27,28 @@ void Proxy::startLoading(const QString &path,
   m_loadImagesFutureWatcher.setFuture(m_loadImagesFuture);
 }
 
-QStringList Proxy::getImagesPathList()
+QStringList DataLoader::getSourcePhotoPathList()
 {
-  return m_imagePathList;
+  return m_sourcePhotoPathList;
 }
 
-QQmlPropertyMap* Proxy::getDestinationPathFilesCache()
+QQmlPropertyMap* DataLoader::getDestinationPathPhotosCache()
 {
-  return m_filesCache;
+  return m_destinationPhotoCache;
 }
 
-void Proxy::startLoadingFiles()
+void DataLoader::startLoadingFiles()
 {
   m_loadFilesFuture = QtConcurrent::run(
         FileOperationHandler::getDestinationPathFilesCache, m_destinationPathList);
   m_loadFilesFutureWatcher.setFuture(m_loadFilesFuture);
 }
 
-void Proxy::onLoadingFinished()
+void DataLoader::onLoadingFinished()
 {
-  m_imagePathList = m_loadImagesFuture.result();
-  m_filesCache = m_loadFilesFuture.result();
+  m_sourcePhotoPathList = m_loadImagesFuture.result();
+  m_destinationPhotoCache = m_loadFilesFuture.result();
   emit loadingFinished();
 }
 
-
+}

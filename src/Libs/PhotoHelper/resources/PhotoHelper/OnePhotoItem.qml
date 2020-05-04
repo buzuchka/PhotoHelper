@@ -4,15 +4,11 @@ import QtQuick.Layouts 1.13
 Item {
   id: root
 
-  property var photoModel
-  property var fileOperationHandler
+  property var photoController
 
-  property string currentPhotoIndexText: (mainCurrentIndex + 1) + " / " + elementsCount + " " + qsTr("фото")
-  property string currentPhotoNameText
-
-  property int mainCurrentIndex: 0
-
-  property int outsideIndex: -1
+  property string currentPhotoIndexText: (photoController.currentIndex + 1) + " / " +
+                                         elementsCount + " " + qsTr("фото")
+  property string currentPhotoNameText: photoController.currentPhotoName
 
   property bool once: true
 
@@ -21,48 +17,39 @@ Item {
   }
 
   function forwardClicked() {
-    if(mainCurrentIndex < elementsCount - 1) {
-      mainCurrentIndex++
-      photoListView.positionViewAtIndex(mainCurrentIndex, ListView.Beginning)
-      updateCurrentNameLabel()
+    if(photoController.currentIndex < elementsCount - 1) {
+      photoController.increaseCurrentIndex()
+      photoListView.positionViewAtIndex(photoController.currentIndex, ListView.Beginning)
       updateFocus()
     }
   }
 
   function backClicked() {
-    if(elementsCount > 0 && mainCurrentIndex >= 1) {
-      mainCurrentIndex--
-      photoListView.positionViewAtIndex(mainCurrentIndex, ListView.Beginning)
-      updateCurrentNameLabel()
+    if(elementsCount > 0 && photoController.currentIndex >= 1) {
+      photoController.decreaseCurrentIndex()
+      photoListView.positionViewAtIndex(photoController.currentIndex, ListView.Beginning)
       updateFocus()
     }
   }
 
   function copyPhoto(path) {
-    fileOperationHandler.copyFile(
-          photoModel.getFilePath(mainCurrentIndex),
-          path)
-    photoModel.onFileCopied(mainCurrentIndex, path);
-    photoModel.emitUpdateData(mainCurrentIndex)
+    photoController.copyCurrentPhoto(path)
     updateFocus()
   }
 
   function deletePhoto() {
-    fileOperationHandler.deleteFile(photoModel.getFilePath(mainCurrentIndex))
-    photoModel.deleteItem(mainCurrentIndex)
-    if(mainCurrentIndex == elementsCount - 1)
-      mainCurrentIndex--
-    updateCurrentNameLabel()
+    photoController.deleteCurrentPhotoFromSource()
+    updateFocus()
+  }
+
+  function deletePhotoFromFolder(folderPath) {
+    photoController.deleteCurrentPhotoFromDestination(folderPath)
     updateFocus()
   }
 
   function rotateRightPhoto() {
-    photoModel.rotateRight(mainCurrentIndex)
+    photoController.rotateCurrentPhotoRight()
     updateFocus()
-  }
-
-  function updateCurrentNameLabel() {
-    currentPhotoNameText = photoModel.getFileName(mainCurrentIndex)
   }
 
   ColumnLayout {
@@ -78,7 +65,7 @@ Item {
       interactive: false
       orientation: ListView.Horizontal
 
-      model: photoModel
+      model: photoController.getPhotoModel()
 
       delegate: Item {
         id: photoWrapper
@@ -115,9 +102,12 @@ Item {
               z: dragArea.z+1
               anchors.centerIn: parent
 
-              width: (model.orientation === 0) || (model.orientation === 2) ?
+              width: (model.orientation === 0) ||
+                     (model.orientation === 2) ||
+                     (model.orientation === 4) ?
                        parent.width : parent.height
-              height: (model.orientation === 0) || (model.orientation === 2) ?
+              height: (model.orientation === 1) ||
+                      (model.orientation === 3) ?
                        parent.height : parent.width
 
               fillMode: Image.PreserveAspectFit
@@ -251,11 +241,8 @@ Item {
     }
   }
   Component.onCompleted: {
-    if(outsideIndex > 0) {
-      mainCurrentIndex = outsideIndex
-      photoListView.positionViewAtIndex(mainCurrentIndex, ListView.Beginning)
-    }
-    updateCurrentNameLabel()
+    photoController.switchToCurrentIndex()
+    photoListView.positionViewAtIndex(photoController.currentIndex, ListView.Beginning)
     updateFocus()
   }
 }
