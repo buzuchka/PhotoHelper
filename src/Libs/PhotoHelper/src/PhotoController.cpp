@@ -28,6 +28,8 @@ PhotoController::PhotoController(QObject *parent)
           this, &PhotoController::isCurrentPhotoOrientationCorrectChanged);
   connect(this, &PhotoController::currentIndexChanged,
           this, &PhotoController::updateDestinationFolderModelContainsState);
+  connect(this, &PhotoController::selectedIndexesChanged,
+          this, &PhotoController::updateDestinationFolderModelContainsState);
 }
 
 PhotoModel *PhotoController::getPhotoModel()
@@ -211,7 +213,7 @@ void PhotoController::updateDestinationFolderModelContainsState()
 {
   if(!m_selectedIndexes.isEmpty())
   {
-    QList<bool> states =  m_photoModel->getContainsState(m_currentIndex);
+    QList<bool> states =  m_photoModel->getContainsState(m_selectedIndexes.at(0));
     for(int i = 1; i < m_selectedIndexes.count(); ++i)
     {
       QList<bool> currentStates =
