@@ -160,6 +160,7 @@ void PhotoController::deleteSelectedPhotosFromSource()
   }
 
   setSelectedIndexes({});
+  emit elementsCountChanged();
 }
 
 void PhotoController::deleteCurrentPhotoFromDestination(QString const& path)
