@@ -97,7 +97,7 @@ QList<bool> PhotoModel::getContainsState(int index)
 {
   QList<bool> states;
 
-  if(m_pathList.empty()) {
+  if(m_pathList.empty() || index >= m_pathList.count()) {
     for(int i = 0; i < m_folderPathColorCache.count(); ++i)
       states.push_back(false);
     return states;
@@ -126,7 +126,7 @@ QString PhotoModel::getFilePath(int index)
 
 QString PhotoModel::getFileName(int index)
 {
-  if(index < 0 || (m_pathList.count() == 0))
+  if(index < 0 || (m_pathList.count() == 0) || (index > m_pathList.count()))
     return QString();
 
   QFileInfo fileInfo(m_pathList.at(index));

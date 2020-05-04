@@ -266,7 +266,10 @@ Window {
     id: settingsDialog
     folderSet: root.folderSet
     title: root.title
-    onSaveButtonClicked: reloadData()
+    onSaveButtonClicked: {
+      folderSet.setLastOperatedIndex(0)
+      reloadData()
+    }
     onCloseButtonClicked: updateFocus()
   }
 

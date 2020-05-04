@@ -60,6 +60,7 @@ void PhotoController::onStartReloadData(FolderSet *folderSet)
   m_photoModel->setLastOperatedIndex(folderSet->getLastOperatedIndex());
   m_photoModel->setFolderPathColorCache(folderPathColorCache);
 
+  setSelectedIndexes({});
   setCurrentIndex(folderSet->getLastOperatedIndex());
 
   m_destinationFolderModel->init();
@@ -68,6 +69,12 @@ void PhotoController::onStartReloadData(FolderSet *folderSet)
 void PhotoController::onFinishReloadData(const QStringList &sourcePhotoPathList,
                                          QQmlPropertyMap *destinationPathPhotosCache)
 {
+  if(m_currentIndex >= sourcePhotoPathList.count())
+  {
+    setCurrentIndex(0);
+    m_photoModel->setLastOperatedIndex(0);
+  }
+
   m_photoModel->setDestinationPathFilesCache(destinationPathPhotosCache);
   m_photoModel->setData(sourcePhotoPathList);
 
