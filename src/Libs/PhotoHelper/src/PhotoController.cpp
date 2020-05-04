@@ -15,8 +15,8 @@ QColor GetColorByName(const QString& name);
 
 PhotoController::PhotoController(QObject *parent)
   : QObject(parent)
-  , m_photoModel(new PhotoModel)
-  , m_destinationFolderModel(new DestinationFolderModel)
+  , m_photoModel(new PhotoModel(parent))
+  , m_destinationFolderModel(new DestinationFolderModel(parent))
   , m_currentIndex(0)
 {
   QQmlEngine::setObjectOwnership(m_photoModel, QQmlEngine::CppOwnership);
@@ -66,6 +66,7 @@ void PhotoController::onStartReloadData(FolderSet *folderSet)
   setCurrentIndex(folderSet->getLastOperatedIndex());
 
   m_destinationFolderModel->init();
+  emit elementsCountChanged();
 }
 
 void PhotoController::onFinishReloadData(const QStringList &sourcePhotoPathList,
