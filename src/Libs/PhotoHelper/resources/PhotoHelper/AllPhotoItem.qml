@@ -114,8 +114,9 @@ Item {
                      (model.orientation === 2) ||
                      (model.orientation === 4) ?
                        parent.width : parent.height
-              height: (model.orientation === 1) ||
-                      (model.orientation === 3) ?
+              height: (model.orientation === 0) ||
+                      (model.orientation === 2) ||
+                      (model.orientation === 4) ?
                        parent.height : parent.width
 
               verticalAlignment: (model.orientation === 0) ||
