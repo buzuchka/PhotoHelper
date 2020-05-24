@@ -256,6 +256,7 @@ void PhotoController::switchToCurrentIndex()
 {
   if(m_selectedIndexes.count() > 0)
     setCurrentIndex(m_selectedIndexes.at(0));
+  setSelectedIndexes({});
 }
 
 }
